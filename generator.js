@@ -10,12 +10,12 @@ Hooks.on("chatMessage", (html, content, msg) => {
     if(commands.length === 1) {
     	let message;
       msg.content = "<p>What kind of trasure do you want to generate?</p>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=-1><b>&gt; Random</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=1><b>&gt; Abyssal</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=2><b>&gt; Beast</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=3><b>&gt; Humanoid</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=4><b>&gt; Mutant</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=5><b>&gt; Supernatural</b></a></div>";
+      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=-1><b>&gt; Random</b></a></div>";
+      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=1><b>&gt; Abyssal</b></a></div>";
+      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=2><b>&gt; Beast</b></a></div>";
+      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=3><b>&gt; Humanoid</b></a></div>";
+      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=4><b>&gt; Mutant</b></a></div>";
+      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=5><b>&gt; Supernatural</b></a></div>";
 	  msg.content += "<p>Click above or use the command as <i>/treasuregen [type] [name]</i></p>";
 	    if(msg) {
 	      ChatMessage.create(msg);
@@ -41,7 +41,7 @@ Hooks.on("chatMessage", (html, content, msg) => {
 });
 
 Hooks.on('renderChatLog', (log, html, data) => {
-  html.on("click", '.trasuregenerator-type', event => {
+  html.on("click", '.creaturegenerator-type', event => {
     event.preventDefault();
 	//console.log(event.currentTarget);
     zweihanderCreatureGenerator($(event.currentTarget).attr("data-treasure-type"));
