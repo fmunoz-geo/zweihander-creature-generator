@@ -2,7 +2,7 @@
   "name": "zweihander-creature-generator",
   "title": "Zweihander – Random Creature Generator",
   "description": "Zweihander RPG Monster generator. It uses the mechanisms from its Chaos supplement Main Gauche. Based on https://pacomiscelaneousstuff.blogspot.com/2019/09/zweihander-monster-generator.html",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "author": "fmunoz",
   "minimumCoreVersion": "9",
   "compatibleCoreVersion" : "9.255",
@@ -11,7 +11,7 @@
       "generator.js"
   ],
   "url": "https://github.com/fmunoz-geo/zweihander-creature-generator",
-  "manifest": "https://raw.githubusercontent.com/fmunoz-geo/zweihander-creature-generator/1.0.0/module.json",
-  "download": "https://github.com/fmunoz-geo/zweihander-creature-generator/archive/refs/tags/1.0.0.zip"
+  "manifest": "https://raw.githubusercontent.com/fmunoz-geo/zweihander-creature-generator/1.0.1/module.json",
+  "download": "https://github.com/fmunoz-geo/zweihander-creature-generator/archive/refs/tags/1.0.1.zip"
 }
 

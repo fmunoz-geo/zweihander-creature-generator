@@ -8,15 +8,16 @@ Hooks.on("chatMessage", (html, content, msg) => {
   if(command === "/creaturegen") {
 	console.log(commands);
     if(commands.length === 1) {
-    	let message;
-      msg.content = "<p>What kind of trasure do you want to generate?</p>";
-      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=-1><b>&gt; Random</b></a></div>";
-      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=1><b>&gt; Abyssal</b></a></div>";
-      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=2><b>&gt; Beast</b></a></div>";
-      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=3><b>&gt; Humanoid</b></a></div>";
-      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=4><b>&gt; Mutant</b></a></div>";
-      msg.content += "<div><a class='creaturegenerator-type' data-treasure-type=5><b>&gt; Supernatural</b></a></div>";
-	  msg.content += "<p>Click above or use the command as <i>/treasuregen [type] [name]</i></p>";
+    	//let message;
+      msg.content = "<p>What kind of creature do you want to generate?</p>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=-1><b>&gt; Random</b></a></div>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=1><b>&gt; Abyssal</b></a></div>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=2><b>&gt; Animal</b></a></div>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=3><b>&gt; Beast</b></a></div>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=4><b>&gt; Humanoid</b></a></div>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=5><b>&gt; Mutant</b></a></div>";
+      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=6><b>&gt; Supernatural</b></a></div>";
+	  msg.content += "<p>Click above or use the command as <i>/creaturegen [type] [size] [Risk] [notch]</i></p>";
 	    if(msg) {
 	      ChatMessage.create(msg);
 	    }
@@ -25,10 +26,11 @@ Hooks.on("chatMessage", (html, content, msg) => {
 			switch(commands[1].toLowerCase()) {
 				case 'random': commands[1]=-1;break;
 				case 'abyssal': commands[1]=1;break;
-				case 'beast': commands[1]=2;break;
-				case 'humanoid': commands[1]=3;break;
-				case 'mutant': commands[1]=4;break;
-				case 'supernatural': commands[1]=5;break;
+				case 'animal': commands[1]=2;break;
+				case 'beast': commands[1]=3;break;
+				case 'humanoid': commands[1]=4;break;
+				case 'mutant': commands[1]=5;break;
+				case 'supernatural': commands[1]=6;break;
 				default: commands[1]=-1;
 			}
 			zweihanderCreatureGenerator(commands[1], commands[2]);
@@ -36,15 +38,15 @@ Hooks.on("chatMessage", (html, content, msg) => {
 		return false;
   }
   } else {
-		notifications().info("No permisions to create items")
+		notifications().info("No permisions to create actors");
   }
 });
 
 Hooks.on('renderChatLog', (log, html, data) => {
-  html.on("click", '.creaturegenerator-type', event => {
+  html.on("click", '.trasuregenerator-type', event => {
     event.preventDefault();
 	//console.log(event.currentTarget);
-    zweihanderCreatureGenerator($(event.currentTarget).attr("data-treasure-type"));
+    zweihanderCreatureGenerator($(event.currentTarget).attr("data-trasuregenerator-type"));
   });
 });
 
@@ -109,6 +111,7 @@ var WeaponBothChance = [0.9, 0.9, 0.9, 0.2, 0.6, 0.5];
 var MageChance   = [0.2, 0.1, 0.3, 0.1, 0.2, 0.3];
 var Mage = 0;
 var WeaponUser = 0;
+var SpellNames = [];
 
 var SizeN;
 var SizeAll = ["Small","Normal","Large","Huge"];
@@ -145,16 +148,19 @@ var ArmorBonus = 0;
 var Trappings = [];
 var TrappingTxt = "";
 
+var Armours = [];
+var ItWeapons = [];
+
 var TraitsByRisk = [[2,3,4,4],[6,7,8,8],[10,11,12,12],[10,11,12,12]];
 var TraitsBasic = [
 "Accursed","Ambush Tactics","Autotomy","Aversion to Light","Battle Frenzy","Blitz",
-["Bloodless","Hangin' Tough"],"Bloodlust","Bog Stench","Chomp","Chthonian Dweller","Creepy Crawlies",
-["Dark Sense","Fey Sight"],"Dense Anatomy","Dionysian Delights","Disease-ridden","Faces of Death","Fast on Their Feet", 
+["Bloodless","Hangin’ Tough"],"Bloodlust","Bog Stench","Chomp","Chthonian Dweller","Creepy Crawlies",
+["Dark Sense","Fey Sight"],"Dense Anatomy","Dionysian Delights","Disease-ridden (INSERT DISEASE)","Faces of Death","Fast on Their Feet", 
 ["Feckless Runt","Herp Derp","Mindless","Sniveling Whelp","Steely Fortitude"],
 ["Feel the Heat","Flammable"],"Fetid Weaponry", 
 ["Hatred (Humans)","Hatred (Dwarves)","Hatred (Elves)","Hatred (Gnomes)","Hatred (Ogres)"],
 "Foul Mutation","Lick Your Wounds","Menacing",
-["Natural Armor (1)","Natural Armor (3)","Natural Armor (5)","Scar the Flesh"],
+["Natural Armor (1)","Natural Armor (1)","Natural Armor (3)","Natural Armor (5)","Scar the Flesh"],
 "One-two Punch","Pack Mentality",
 ["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings"],
 "Perfect Camouflage",
@@ -172,14 +178,14 @@ var TraitsBasicMage = ["Winds of Chaos"];
 
 var TraitsIntermediate = [
 "Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],
-["Aethereal Form","Aethereal Form#Bonds of Death","Aethereal Form#Bonds of Death"],"Ambush Tactics",
+["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],"Ambush Tactics",
 "Arcana of Horror","Autotomy","Aversion to Light","Bane of Lycanthropes","Battle Frenzy",
 "Blitz",
-["Bloodless","Hangin' Tough"],"Bloodlust","Bog Stench","Broken Gut-plate",
+["Bloodless","Hangin’ Tough"],"Bloodlust","Bog Stench","Broken Gut-plate",
 ["Brute Strength","Brute Strength#Hideous Might","Masterfully Adroit","Masterfully Adroit"],"Brush With Death",
-"Call of the Abyss","Captivating Cry","Chomp","Champion's Call",
+"Call of the Abyss","Captivating Cry","Chomp","Champion’s Call",
 "Chthonian Dweller","Corrosive Bile",["Crippling Constrictor","Inescapable","Inescapable#Crippling Constrictor"],"Death Roll","Demonic Frenzy",
-["Dark Sense","Fey Sight"],"Dionysian Delights","Disease-ridden","Divide & Conquer", "Fast on Their Feet", 
+["Dark Sense","Fey Sight"],"Dionysian Delights","Disease-ridden (INSERT DISEASE)","Divide & Conquer", "Fast on Their Feet", 
 ["Feel the Heat","Fireproof","Flammable","Dense Anatomy","Dense Anatomy#Flammable"],"Fetid Weaponry", 
 ["Hatred (Humans)","Hatred (Dwarves)","Hatred (Elves)","Hatred (Gnomes)","Hatred (Ogres)"],
 "Foul Mutation","Grossly Paranoid","Hard-nosed",
@@ -189,7 +195,7 @@ var TraitsIntermediate = [
 "One-two Punch","Pack Mentality",["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings"],"Perfect Camouflage",
 ["Petrifying Gaze","Petrifying Gaze#Eyes Wide Shut"],
 "Poison Resistance",
-["Reanimator#I Thee Wed","Reanimator#Kill It With Fire","Reanimator#Kill It With Fire","Reanimator#Soul Jar","Reanimator#Witchboard"],
+["Reanimator#I Thee Wed","Reanimator#Kill it With Fire","Reanimator#Kill it With Fire","Reanimator#Soul Jar","Reanimator#Witchboard"],
 "Ringen","Ripping Teeth",
 "Salt of the Earth","Sanity-blasting","Silent Stalker",
 "Unruly",
@@ -197,20 +203,20 @@ var TraitsIntermediate = [
 ];
 var TraitIntermediateMage = ["Winds of Chaos","Living Chaos"];
 
-var TraitsIntermediateWeaponUser = ["Big Grim","Both-handedness","Snikt!Snikt!","Greanadier","Gift of Devils","I Got Axe for You","Murderous Attacks","Point Blanck","Saddle Tactics","Serpentine Cloak","Sharp-sighted","Shootfighting","Smoke Bomb",["Blam!Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Fwip!Fwip!","Fwip!Fwip!"],"Wytch-science"];
+var TraitsIntermediateWeaponUser = ["Big Grim","Both- handedness","Snikt! Snikt!","Grenadier","Gift of Devils","I Got Axe for You","Murderous Attacks","Point Blanck","Saddle Tactics","Serpentine Cloak","Sharp-sighted","Shootfighting","Smoke Bomb",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
 
 var TraitsAdvanced = [
-"Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Aethereal Form","Aethereal Form#Bonds of Death","Aethereal Form#Bonds of Death"],
+"Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],
 "Ambush Tactics","Arcana of Horror","Autotomy","Aversion to Light","Battle Frenzy",
 "Blitz",
-["Bloodless","Hangin' Tough"],"Bloodlust",
+["Bloodless","Hangin’ Tough"],"Bloodlust",
 ["Brute Strength","Brute Strength#Hideous Might","Masterfully Adroit","Masterfully Adroit"],
-"Brush With Death","Call of the Abyss","Cancerous Absorption","Chomp","Champion's Call",
+"Brush With Death","Call of the Abyss","Cancerous Absorption","Chomp","Champion’s Call",
 "Chthonian Dweller","Cold Hands","Corrosive Bile",
 ["Corruptive Breath#Fiery Retribution#Spit Fire","Corruptive Breath#Fiery Retribution#Spit Fire","Fiery Retribution#Spit Fire","Corruptive Breath#Spit Fire","Spit Fire"],
 ["Crippling Constrictor","Flailing Tentacles#Crippling Constrictor","Flailing Tentacles#Crippling Constrictor#Inescapable","Inescapable","Crippling Constrictor#Inescapable","Swallow Whole","Inescapable#Swallow Whole"],
 "Death Roll","Demonic Frenzy",
-["Dark Sense","Fey Sight"],"Dionysian Delights","Disease-ridden","Divide & Conquer", ["Fast on Their Feet","Lumbering Brute"], 
+["Dark Sense","Fey Sight"],"Dionysian Delights","Disease-ridden (INSERT DISEASE)","Divide & Conquer", ["Fast on Their Feet","Lumbering Brute"], 
 ["Feel the Heat","Fireproof","Feel the Heat#Fireproof","Flammable","Dense Anatomy","Dense Anatomy#Flammable"],
 "Fetid Weaponry", 
 ["Hatred (Humans)","Hatred (Dwarves)","Hatred (Elves)","Hatred (Gnomes)","Hatred (Ogres)"],
@@ -221,30 +227,30 @@ var TraitsAdvanced = [
 "One-two Punch","Pack Mentality",["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings","Paw/hoof/wing#Broken Wings#Strafing Talons"],"Perfect Camouflage",
 ["Petrifying Gaze","Petrifying Gaze#Eyes Wide Shut","Transfixed Gaze","Transfixed Gaze#Entrancing"],
 ["Poison Resistance","Poison Resistance","Poison Resistance#Poisonous Bite","Poison Resistance#Poisonous Bite","Poisonous Bite"],
-["Reanimator#Ashes to Ashes","Reanimator#Come Into the Light","Reanimator#Weakness to Brass","Reanimator#Kill It With Fire","Reanimator#Soul Jar","Reanimator#Golden Death","Vampire's Curse","Vampire's Curse","Vampire's Curse"],
+["Reanimator#Ashes to Ashes","Reanimator#Come Into the Light","Reanimator#Weakness to Brass","Reanimator#Kill it With Fire","Reanimator#Soul Jar","Reanimator#Golden Death","Vampire’s Curse","Vampire’s Curse","Vampire’s Curse"],
 "Ringen","Ripping Teeth",
 "Salt of the Earth","Sanity-blasting","Silent Stalker",
 "Unruly","Wall Crawler","Wanton Hunger","Wind Kick",
 ["Weak Spot (Head)","Weak Spot (Body)","Weak Spot (Legs)"]
 ];
 
-var TraitsAdvancedMage = ["Aetheric Domination","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways"];
-var TraitsAdvancedWeaponUser = ["Big Grim","Serpentine Cloak","Both-handedness","Gift of Devils","I Got Axe for You","Murderous Attacks","Saddle Tactics","Snikt!Snikt!","Shootfighting","Shotgun Bang!","Smoke Bomb","Sweeping Strike",["Blam!Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Point Blanck","Fwip!Fwip!","Fwip!Fwip!"],"Wytch-science"];
+var TraitsAdvancedMage = ["Ætheric Domination","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways"];
+var TraitsAdvancedWeaponUser = ["Big Grim","Serpentine Cloak","Both- handedness","Gift of Devils","I Got Axe for You","Murderous Attacks","Saddle Tactics","Snikt! Snikt!","Shootfighting","Shotgun Bang!","Smoke Bomb","Sweeping Strike",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Point Blanck","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
 
 
 
 var TraitsElite = [
-"Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Aethereal Form","Aethereal Form#Bonds of Death","Aethereal Form#Bonds of Death"],
+"Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],
 "Ambush Tactics","Arcana of Horror","Autotomy","Aversion to Light","Battle Frenzy",
 "Blitz",
-["Bloodless","Hangin' Tough"],"Bloodlust",
+["Bloodless","Hangin’ Tough"],"Bloodlust",
 ["Brute Strength","Brute Strength#Hideous Might","Masterfully Adroit","Masterfully Adroit"],
-"Brush With Death","Call of the Abyss","Cancerous Absorption","Chomp","Champion's Call",
+"Brush With Death","Call of the Abyss","Cancerous Absorption","Chomp","Champion’s Call",
 "Chthonian Dweller","Cold Hands","Corrosive Bile",
 ["Corruptive Breath#Fiery Retribution#Spit Fire","Corruptive Breath#Fiery Retribution#Spit Fire","Fiery Retribution#Spit Fire","Corruptive Breath#Spit Fire","Spit Fire"],
 ["Crippling Constrictor","Flailing Tentacles#Crippling Constrictor","Flailing Tentacles#Crippling Constrictor#Inescapable","Inescapable","Crippling Constrictor#Inescapable","Swallow Whole","Inescapable#Swallow Whole"],
 "Death Roll","Demonic Frenzy",
-["Dark Sense","Fey Sight"],"Dionysian Delights","Disease-ridden","Divide & Conquer", ["Fast on Their Feet","Lumbering Brute"], 
+["Dark Sense","Fey Sight"],"Dionysian Delights","Disease-ridden (INSERT DISEASE)","Divide & Conquer", ["Fast on Their Feet","Lumbering Brute"], 
 ["Feel the Heat","Fireproof","Feel the Heat#Fireproof","Flammable","Dense Anatomy","Dense Anatomy#Flammable"],
 "Fetid Weaponry", 
 ["Hatred (Humans)","Hatred (Dwarves)","Hatred (Elves)","Hatred (Gnomes)","Hatred (Ogres)"],
@@ -256,19 +262,20 @@ var TraitsElite = [
 ["Petrifying Gaze","Petrifying Gaze#Eyes Wide Shut","Transfixed Gaze","Transfixed Gaze#Entrancing"],
 ["Poison Resistance","Poison Resistance","Poison Resistance#Poisonous Bite","Poison Resistance#Poisonous Bite","Poisonous Bite"],
 "Potent Blows",
-["Reanimator#Ashes to Ashes","Reanimator#Come Into the Light","Reanimator#Weakness to Brass","Reanimator#Kill It With Fire","Reanimator#Soul Jar","Reanimator#Golden Death","Vampire's Curse","Vampire's Curse","Vampire's Curse"],
+["Reanimator#Ashes to Ashes","Reanimator#Come Into the Light","Reanimator#Weakness to Brass","Reanimator#Kill it With Fire","Reanimator#Soul Jar","Reanimator#Golden Death","Vampire’s Curse","Vampire’s Curse","Vampire’s Curse"],
 "Ringen","Ripping Teeth",
 "Salt of the Earth","Sanity-blasting","Silent Stalker",
 "Unruly","Wall Crawler","Wanton Hunger","Wind Kick",
 ["Weak Spot (Head)","Weak Spot (Body)","Weak Spot (Legs)"], "Word of Death"
 ];
 
-var TraitsEliteMage = ["Aetheric Domination","Awakening","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways"];
+var TraitsEliteMage = ["Ætheric Domination","Awakening","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways"];
 
 var TraitsAll = [TraitsBasic,TraitsIntermediate,TraitsAdvanced,TraitsAdvanced];
 var TraitsWeaponUserAll = [TraitsBasicWeaponUser,TraitsIntermediateWeaponUser,TraitsAdvancedWeaponUser ,TraitsAdvancedWeaponUser];
 var TraitsMageAll = [TraitsBasicMage,TraitIntermediateMage,TraitsAdvancedMage,TraitsEliteMage];
 var TraitNames = [];
+var MutationArray = [];
 var TraitTxt = "";
 
 var TraitDescription = [
@@ -286,18 +293,18 @@ var TraitDescription = [
 ["Dark Sense","These creatures can see in the dark."],
 ["Dense Anatomy","These creatures only suffer Damage dealt by fire."],
 ["Dionysian Delights","When these creatures are encountered, roll 1D6 Chaos Die. If the result is face '1-5', they are Intoxicated. If the result is face '6', they are not Intoxicated."],
-["Disease-ridden","When these creatures reduce a foe to Seriously Wounded, the foe's wounds are Infected. When they reduce a foe to Grievously Wounded, the foe contracts the Disease indicated in parentheses."],
+["Disease-ridden (INSERT DISEASE)","When these creatures reduce a foe to Seriously Wounded, the foe's wounds are Infected. When they reduce a foe to Grievously Wounded, the foe contracts the Disease indicated in parentheses."],
 ["Eyes Wide Shut","When this creature's eyes are successfully struck with a Called Shot (otherwise treated as their head), they lose their ability to use Petrifying Gaze."],
 ["Faces of Death","After these creatures consume the face of someone they have killed, they assume their memories and mannerisms with near perfection. This includes use of Magick, if applicable. Only with a Scrutinize Test made with a Critical Success would someone else be able to tell otherwise. This Trait's effects last until the new moon."],
 ["Fast on Their Feet","These creatures reduce all Movement Actions by 1 AP (to a minimum of 1 AP). They can also Dodge both melee and ranged weapons."],
 ["Feckless Runt","When this creature's Turn begins, roll 1D6 Chaos Die. If the result is face '6', they attack that Turn with a senseless object that does no Damage. This means that the creature will have a foe's attention and be in the way, but will otherwise be an ineffective combatant."],
 ["Feel the Heat","When foes are Engaged with this creature, they must Resist with a successful Coordination Test or be exposed to Mildly Dangerous flames."],
 ["Fetid Weaponry","When these creatures inflict an Injury, their foe's wounds are also Infected."],
-["Fey Sight","These creatures can see in the dark and automatically spot foes who are hidden or Aethereal."],
+["Fey Sight","These creatures can see in the dark and automatically spot foes who are hidden or Æthereal."],
 ["Flammable","When exposed to flames, these creatures suffer an additional 1D10+1 Damage from fire."],
 ["Foul Mutation","When these creatures are encountered, roll 1D6 Chaos Dice if a Basic Risk Factor; 2D6 Chaos Dice if an Intermediate Risk Factor; 3D6 if an Advanced Risk Factor; and 4D6 if an Elite Risk Factor. For every face '6', addc one Taint of Chaos to the creature."],
 ["Hallucinogenic Frenzy","After ingesting a dose of red cap mushrooms, these creatures add 1D6 Fury Die to melee weapon Damage."],
-["Hangin' Tough","These creatures cannot Bleed or suffer Injuries."],
+["Hangin’ Tough","These creatures cannot Bleed or suffer Injuries."],
 ["Hatred (Humans)","When facing the Ancestries indicated in the parentheses, these creatures add an additional 1D6 Fury Die to Damage and automatically succeed at Resolve Tests."],
 ["Hatred (Dwarves)","When facing the Ancestries indicated in the parentheses, these creatures add an additional 1D6 Fury Die to Damage and automatically succeed at Resolve Tests."],
 ["Hatred (Elves)","When facing the Ancestries indicated in the parentheses, these creatures add an additional 1D6 Fury Die to Damage and automatically succeed at Resolve Tests."],
@@ -349,20 +356,20 @@ var TraitDescription = [
 ["Winds of Chaos","When casting Generalist Magick , at their option, these creatures can automatically succeed at the Incantation Test, but must drop one step down the Peril Condition Track negatively. In addition, they must always add 1 additional Chaos Die when they Channel Power."],
 ["Acidic Spittle","These creatures can use their breath as a ranged weapon. This allows them to strike a single foe within 1+[PB], causing the foe to suffer 1D10+1 Damage from acid. However, Acidic Spittle ignores a foe's Damage Threshold Modifier from armor. A foe can attempt to Dodge Acidic Spittle or Parry it with a shield. Acidic Spittle can be used while Engaged with foes."],
 ["Accursed","These creatures cannot be harmed by normal weapons, only by weapons which have been imbued with Magick."],
-["Aethereal Form","Creatures in Aethereal Form cannot inflict Damage or manipulate physical objects, but can pass through objects effortlessly and hover 1 yard off the ground. They can manifest into physical form instantaneously, but assuming Aethereal Form once more costs 2 APs."],
+["Æthereal Form","Creatures in Æthereal Form cannot inflict Damage or manipulate physical objects, but can pass through objects effortlessly and hover 1 yard off the ground. They can manifest into physical form instantaneously, but assuming Æthereal Form once more costs 2 APs."],
 ["Arcana of Horror","These creatures can use Bolt of Flame from the Arcana of Pyromancy. If at least three of these creatures are standing within sight of one another, they can use Withering Touch from the Arcana of Sorcery. If at least nine of these creatures are standing within sight of one another, they can use Death's Embrace from the Arcana of Morticism. Should a foe be Slain! by use of any of these Magicks, they are immediately turned into a Lemurian Host. Reagents are unnecessary to cast this Magick."],
 ["Bane of Lycanthropes","When creatures are struck with weapons coated with a sprig of wolfsbane, they suffer an additional 1D6 Fury Die in Damage."],
 ["Big Grim","These creatures can use two-handed weapons in one hand and take advantage of the Adaptable Quality."],
-["Blam!Blam!","These creatures may spend 3 APs to attack twice with two ranged weapons, providing they possess the Gunpowder Quality and are Loaded."],
-["Bonds of Death","These creatures can manipulate physical objects in Aethereal Form."],
-["Both-handedness","When they wield two one-handed melee weapons and fail a Combat-based Skill Test, they may re-roll to generate a better result, but must accept the outcome."],
+["Blam! Blam!","These creatures may spend 3 APs to attack twice with two ranged weapons, providing they possess the Gunpowder Quality and are Loaded."],
+["Bonds of Death","These creatures can manipulate physical objects in Æthereal Form."],
+["Both- handedness","When they wield two one-handed melee weapons and fail a Combat-based Skill Test, they may re-roll to generate a better result, but must accept the outcome."],
 ["Broken Gut-plate","After these creatures are Seriously Wounded or made subject to a Called Shot to the body and suffer at least 9 Damage, they suffer a penalty of -6 to their Damage Threshold."],
 ["Broken Wings","Once this creature is Grievously Wounded, it can no longer fly."],
 ["Brush With Death","When these creatures make a successful attack bare-handed, they provoke Fear, but do no Damage. They also force a foe to Resist with a Resolve Test or be aged by one year. For every year aged, the foe permanently reduces Brawn by 1%."],
 ["Brute Strength","These creatures refer to [BB] for Damage with melee weapons and ones with the Throwing Quality. They have also factored in +3 to their [BB]. Finally, they can inflict Injuries with Pummeling weapons."],
 ["Call of the Abyss","When this creature suffers Damage and is unable to deal Damage by the end of its next Turn, roll 3D6. If all three dice show face '6', the creature is banished back to the Abyss, until summoned once again."],
 ["Captivating Cry","When foes can hear this creature, they must Resist with a successful Resolve Test or be drawn towards the sound. Should they enter a dangerous area to find the sound, they can attempt another Resolve Test. Once they are able to visually see the creature, the Captivating Cry's effects end."],
-["Champion's Call","One foe is left Defenseless to all of this creature's attacks, until the foe is defeated. The creature may select a new foe once the current one is defeated."],
+["Champion’s Call","One foe is left Defenseless to all of this creature's attacks, until the foe is defeated. The creature may select a new foe once the current one is defeated."],
 ["Corrosive Bile","When creatures use this attack, it ignores their foe's Damage Threshold Modifier from armor."],
 ["Crippling Constrictor","When these creatures maintain a Chokehold, they deal Damage as if they were using a bare-handed weapon."],
 ["Death Roll","When these creatures deal Damage, at their option, they can force a foe to Resist a Chokehold."],
@@ -371,7 +378,7 @@ var TraitDescription = [
 ["Fetid Stick","When these creatures are encountered, they carry a staff which buzzes with flies. When they deal Damage, the foe's wounds are also Infected. It can only be used in the hands of these creatures, being otherwise useless relics to others. If picked up by PCs whose Order Ranks are higher than their Chaos Ranks, they are instantly infected with Chaotic Rot."],
 ["Fireproof","These creatures and their possessions are entirely immune to Damage from fire."],
 ["Foul Mutation","When these creatures are encountered, roll 1D6 Chaos Dice if it has a Basic Risk Factor; 2D6 Chaos Dice if an Intermediate Risk Factor; 3D6 if an Advanced Risk Factor; or 4D6 if an Elite Risk Factor. For every face '6', add one Taint of Chaos to the creature."],
-["Fwip!Fwip!","These creatures may spend 3 APs to attack twice with ranged weapons without Loading."],
+["Fwip! Fwip!","These creatures may spend 3 APs to attack twice with ranged weapons without Loading."],
 ["Gastric Acidity","When these creatures deal Damage, a foe must Resist with Coordination. If they fail, the foe's armor, weapon or shield is Ruined!."],
 ["Gift of Devils","These creatures ignore the Heavy Quality of armor to cast Magick."],
 ["Grenadier","When these creatures are encountered, they have a glass grenade. When thrown, it affects multiple foes in a Burst Template. Affected foes must succeed at a Toughness Test or contract Tomb Rot."],
@@ -390,7 +397,7 @@ var TraitDescription = [
 ["In the Face","These creatures can only be harmed by melee and ranged weapons by using a Called Shot to the head."],
 ["Inescapable","When these creatures use a Chokehold, they are able to maintain it for 0 AP and use other Actions In Combat."],
 ["Keening Wail","These creatures can spend 2 APs to make an Interrogation Test. If successful, foes caught in a Cone Template who fail to Resist with a Resolve Test immediately suffer from Fear and cannot Counterspell or Parry until their next Turn. A foe can be made victim to Keening Wail every Turn."],
-["Kill It With Fire","Only after these creature's remains are set On Fire are they forever Slain!."],
+["Kill it With Fire","Only after these creature's remains are set On Fire are they forever Slain!."],
 ["Lamb to the Slaughter","When these creatures Injure a foe with a melee weapon, they inflict two Injuries instead of one."],
 ["Lick Your Wounds","These creatures can spend 1 Misfortune Point to move three steps up the Damage Condition Track positively."],
 ["Light Sensitive","When a foe uses Take Aim for 2 APs to shine a source of light upon this creature before making their attack, reduce its Damage Threshold by a -6 penalty (to a minimum of 1)."],
@@ -409,7 +416,7 @@ var TraitDescription = [
 ["Serpentine Cloak","When these creatures are encountered, they wear a cloak made from an undersea creature. It provides a Damage Threshold Modifier of 1 when worn."],
 ["Sharp-sighted","These creatures do not suffer penalties for ranged weapons at Medium or Long Distances."],
 ["Smoke Bomb","When these creatures are encountered, they have a smoke bomb. When thrown, it explodes outwards. Those caught in an Explosion Template area of effect must reduce their Movement by a -6 penalty, until they escape. In addition, it provides enough concealment for the creature to use their Stealth Skill."],
-["Snikt!Snikt!","These creatures may spend 3 APs to attack twice with melee weapons."],
+["Snikt! Snikt!","These creatures may spend 3 APs to attack twice with melee weapons."],
 ["Stinging Tentacle","When these creatures deal Damage, they have the option to force a foe to Resist a Stunning Blow."],
 ["Strafing Talons","When these creatures execute a successful attack while flying, they also deal 1D10+[AB] physical Peril."],
 ["True Name","Unless foes invoke this creature's True Name before casting Magick, it fails to affect the creature."],
@@ -417,12 +424,12 @@ var TraitDescription = [
 ["Wall Crawler","These creatures can crawl upon both vertical and horizontal surfaces with ease. In addition, they can initiate a ranged Chokehold at a Distance of 3+[PB], with a Load of 1 AP."],
 ["Witchboard","These creatures cannot be permanently Slain! unless their remains are placed beneath a spirit board. Once placed beneath a spirit board, they enter hibernation and will remain so unless the board or remains are removed, therefore giving life to the creature again as it is restored to Unharmed. Only by successfully casting Last Rites over the spirit board are they forever Slain!."],
 ["Wytch-science","When these creatures are encountered, roll 1D6 Chaos Die. If the result is face '1-4', they carry two Wytchfyre pistols. If the result is face '5', they carry a Wytchfyre jezzail. If the result is face '6', they carry a Wytchfyre thrower. While carrying a Wytchfyre thrower, they cannot Charge, Maneuver or Run."],
-["Aetheric Domination","When these creatures would potentially invoke a Chaos Manifestation, they must roll two or more face '6' on Chaos Dice to invoke it."],
+["Ætheric Domination","When these creatures would potentially invoke a Chaos Manifestation, they must roll two or more face '6' on Chaos Dice to invoke it."],
 ["Ashes to Ashes","These creatures cannot be permanently Slain! unless their remains are placed into a decanter consecrated with the Blessed Sacrament Ritual. Within, they remain in hibernation, unless the remains are removed therefore giving life to the creature again. Only by placing the decanter into a font of holy water are they forever Slain!."],
 ["Aversion to Light","When these creatures are exposed to any sort of light (such as that from a torch), they suffer a penalty of -3 to their Damage Threshold."],
 ["Cancerous Absorption","When they render an enemy Slain!, they gain +3 to [BB] and move three steps up the Damage Condition Track positively."],
 ["Ceremonial Runes","When these creatures are encountered, roll 1D6 Chaos Die. If the result is face '1', '2' or '3', they have three Apprentice Runes inscribed upon their staff. If the result is face '4' or '5', they have two Journeyman Runes inscribed upon their staff. If the result is face '6', they have one Master Rune inscribed upon their staff."],
-["Champion's Call","One foe is left Defenseless to all this creature's attacks, until the foe is defeated. The creature may select a new foe once the current one is defeated."],
+["Champion’s Call","One foe is left Defenseless to all this creature's attacks, until the foe is defeated. The creature may select a new foe once the current one is defeated."],
 ["Cold Hands","These creatures ignore the Damage Threshold Modifier a foe's armor may confer when they inflict Damage."],
 ["Lumbering Brute","These creatures cannot Charge, Run or use Movement Actions that require 3 AP."],
 ["Sweeping Strike","When these creatures make a successful attack with a two-handed melee weapon, they strike up to three foes they're Engaged with."],
@@ -437,7 +444,7 @@ var TraitDescription = [
 ["Transfixed Gaze","When these creatures can see a foe (who can also see them), they force a foe to Resist with a Resolve Test or be Mesmerized. Mesmerized foes cannot use any Actions In Combat, but may attempt to Resist again at the beginning of their Turn to escape. The creature cannot use any other Actions while they maintain a Transfixed Gaze. However, they can release the gaze at any time. If the creature suffers Damage while a foe is Mesmerized, they immediately relinquish the hold. Foes who attempt to Resist must flip the results to fail their Skill Test."],
 ["Ungainly","When these creatures are Slain! all those Engaged with it must succeed at a Coordination Test or be knocked Prone beneath of it, suffering 3D10+3 Damage from falling."],
 ["Unlatch Doors","These creatures can automatically unfasten any lock they can see or touch, Magickal or otherwise."],
-["Vampire's Curse","These creatures cannot cross running water, unless by bridge or boat. When exposed to sunlight, they suffer 2D10+2 Damage from fire for every minute they remain exposed. Instead of suffering Injuries in this case, they instead are caught On Fire. When Slain!, they turn into mist and immediately return to their resting place to sleep. For every hour they sleep, they move one step up the Damage Condition Track positively. Once Unharmed, all Injuries are healed as well. However, while asleep, they can be permanently Slain! if an ironwood stake is driven through their heart and the head is removed."],
+["Vampire’s Curse","These creatures cannot cross running water, unless by bridge or boat. When exposed to sunlight, they suffer 2D10+2 Damage from fire for every minute they remain exposed. Instead of suffering Injuries in this case, they instead are caught On Fire. When Slain!, they turn into mist and immediately return to their resting place to sleep. For every hour they sleep, they move one step up the Damage Condition Track positively. Once Unharmed, all Injuries are healed as well. However, while asleep, they can be permanently Slain! if an ironwood stake is driven through their heart and the head is removed."],
 ["Wanton Hunger","When these creatures are encountered, roll 1D6 Chaos Die. If the result is face '1-5', their hunger has been sated. If the result is face '6', their hunger has not yet been sated and they are in a state of frenzy. When sated, they add +1 to both Damage and Peril Condition Tracks. When in a state of frenzy, they add an additional 1D6 Fury Die to Damage."],
 ["Wind Kick","When creatures use this attack, it forces a foe to Resist with a Coordination Test or be thrown 1D10+ [BB] in yards. This attack can be used against three foes at once."],
 ["Word of Death","When these creatures encounter those who are suffering from a Disorder, Disease or Grievous Injury, the foe must Resist with a successful Resolve Test or else be Slain!. However, the foe must be able to see and hear them for Word of Death to work. If a foe succeeds at this Resolve Test, they are forever immune to Word of Death"]
@@ -455,21 +462,21 @@ var SkillValues = [];
 var SkillTxt = "";
 var StatsRareChance   = [0.1, 0.05, 0.05, 0.2, 0.15, 0.15];
 var WeaponsSimple = [
-"<B>Dagger</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Vicious, Weak",
+"<B>Rondel Dagger</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Vicious, Weak",
 "<B>Dirk</B>: SM% . Distance (melee engaged) . Damage [AB] . Fast,Finesse, Light, Weak",
 "<B>Rapier</B>: SM% . Distance (melee engaged) . Damage [AB] . Fast,Finesse, Weak",
-"<B>Threshing Flail</B>: SM% . Distance (melee engaged) . Damage [CB] . Adaptable, Weak",
+"<B>Threshing flail</B>: SM% . Distance (melee engaged) . Damage [CB] . Adaptable, Weak",
 "<B>Cudgel</B>: SM% . Distance (melee engaged or 1 yard) . Damage [CB] . Light, Powerful, Weak"
 ];
 var WeaponsSimpleLow = [
 "<B>Shiv</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Weak",
-"<B>Fire Hardenned Spear</B>: SM% . Distance (melee engaged) . Damage [CB] . Adaptable, Reach, Weak"
+"<B>Fire-hardened spear</B>: SM% . Distance (melee engaged) . Damage [CB] . Adaptable, Reach, Weak"
 ];
 
 var WeaponsMartial = [
 "<B>Sabre</B>: : MM% . Distance (melee engaged) . Damage [CB] . Defensive",
 "<B>Morgenstern</B>: : MM% . Distance (melee engaged) . Damage [CB] . Adaptable, Powerful, Vicious",
-"<B>Battle Axe</B>: : MM% . Distance (melee engaged or 1 yard) . Damage [CB] . Adaptable, Reach, Slow, Vicious"
+"<B>Battle axe</B>: : MM% . Distance (melee engaged or 1 yard) . Damage [CB] . Adaptable, Reach, Slow, Vicious"
 ];
 
 var Attacks = [];
@@ -507,7 +514,7 @@ var WeaponsAnimal = [
 "<B>Terrible Bites or Claws</B>: SM% . Distance (melee engaged) . Damage [CB] . Finesse, Punishing, Vicious",
 "<B>Tusks</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Powerful, Vicious",
 "<B>Vampiric Fangs</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Vicious",
-"<B>Wall Crawler Spinneret</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing",
+//"<B>Wall Crawler Spinneret</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing",
 "<B>Yellow Teeth</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Vicious, Weak"
 ];
 var WeaponsAnimalLow = [
@@ -579,7 +586,7 @@ var TaintOfChaos = [
 ["Acidic Spittle","By spending a Fortune Point, you can make an improvised ranged attack against a single foe within 1+[PB]. They suffer 1D10+[BB] Damage from acid. However, Acidic Spittle ignores a foe's Damage Threshold Modifier from armor, but a foe can attempt to Dodge Acidic Spittle or Parry it with a shield. Acidic Spittle can be used while Engaged with enemies."],
 ["Albinism","You suffer a permanent loss of 9% to Brawn."],
 ["Arachnos","Attacks made bare-handed inflicts a single dose of spider venom."],
-["Astral Vision","You can see in the dark, and spot Aethereal creatures. However, you must flip the results to fail any Skill Test made in broad daylight."],
+["Astral Vision","You can see in the dark, and spot Æthereal creatures. However, you must flip the results to fail any Skill Test made in broad daylight."],
 ["Barbed Spines","Whenever you successfully use a Takedown, you also deal Damage as if you were using a bare-handed weapon."],
 ["Beaked Maw","Attacks made bare-handed gain the Punishing Quality."],
 ["Beweaponed Extremity","Select a single one-handed Martial Melee weapon. Attacks made bare-handed are instead treated as if you were fighting with that weapon. However, you can no longer use one of your hands, nor wield two-handed weapons."],
@@ -601,11 +608,11 @@ var TaintOfChaos = [
 ["Cyclopean Eye",""],
 ["Demonic Tentacle",""],
 ["Doppelganger",""],
-["Egghead",""],
+["Egghead","+9% Intelligence"],
 ["Elongated Neck",""],
 ["Evil Eye",""],
 ["Eyes Without A Face",""],
-["Eyestalks",""],
+["Eyestalks","+9% Perception"],
 ["Fanged Maw",""],
 ["Fantastic Arms",""],
 ["Featherweight",""],
@@ -678,6 +685,31 @@ var TaintOfChaos = [
 ["Zoological Mutation",""]
 ];
 
+var GeneralistSpells = ["Ægis",
+"Anoint Weapon",
+"Bewitched",
+"Cack-handed Grasp",
+"Candlelight",
+"Dispel Magick",
+"Gust of Wind",
+"Hasten Speed",
+"Hat-trick",
+"Haunting",
+"Hush",
+"Indomitable Spirit",
+"Invoke Fury",
+"Magick Missile",
+"Pinprick",
+"Rainshade",
+"Robber's Misery",
+"Sanctuary",
+"Subdue",
+"Trackless Step",
+"Vow of Fealty",
+"Warding",
+"Will o' the Wisp",
+"Wytchsight"];
+
 function parseNamesAny (NamesArray,AnyNames) {
     var x;
     var y;
@@ -718,7 +750,6 @@ function parseTrait2Stats (TraitArray) {
     /* var StatsBonusName =   ["CB","BB","AB","PB","IB","WB","FB"]; */
     var stat = [0, 0, 0, 0, 0, 0, 0];
     var secondary = [0, 0, 0, 0, 0, 0, 0];
-    var secondary = [0, 0, 0, 0, 0, 0, 0];
     var weapons = [];
     for (x in TraitArray) {
         switch (TraitArray[x]) {
@@ -740,12 +771,49 @@ function parseTrait2Stats (TraitArray) {
             case "Scar the Flesh":
                 secondary[2] += 3;
                 break;
+			case "Taint of Chaos: Albinism":
+			case "Albinism":
+                stat[0] += -9;
+				break;
             case "Taint of Chaos: Cancerous Protection":
+            case "Cancerous Protection":
                 secondary[2] += 2;
                 break;
+			case "Taint of Chaos: Conehead":
+			case "Conehead":
+                stat[4] += -9;
+				break;
+			case "Taint of Chaos: Egghead":
+			case "Egghead":
+                stat[4] += 9;
+				break;
+			case "Taint of Chaos: Eyestalks":
+			case "Eyestalks":
+			case "Taint of Chaos: Third Eye":
+			case "Third Eye":
+                stat[3] += 9;
+				break;
+			case "Taint of Chaos: Mace-like Tail":
+			case "Mace-like Tail":
+                weapons.push("<B>Mace-like Tail</B>: SR% . Distance (melee engaged) . Load (1 AP) . Damage [CB] . Slow");
+				break;
+			case "Taint of Chaos: Moronic Mutation":
+			case "Moronic Mutation":
+                stat[5] += -9;
+				break;
+			case "Taint of Chaos: Pinhead":
+			case "Pinhead":
+                stat[3] += -3;
+                stat[4] += -3;
+                stat[5] += -3;
+				break;
+			case "Taint of Chaos: Pony Jumbo":
+			case "Pony Jumbo":
+                stat[0] += -9;
+				break;
             case "Serpentine Cloak":
                 secondary[2] += 1;
-    Trappings.push("Serpentine Cloak");
+				Armours.push("Serpentine Cloak");
                 break;
             case "Natural Armor (1)":
                 secondary[2] += 1;
@@ -775,17 +843,23 @@ function parseTrait2Stats (TraitArray) {
                 weapons.push("<B>Corrosive Bile</B>: SR% . Distance (ranged 1+[PB] yards) . Load (1 AP) . Damage [CB] . Slow");
                 break;
    case "Shotgun Bang!":
-   case "Blam!Blam!":
+   case "Blam! Blam!":
    case "Point Blanck":
-                weapons.push("<B>Flintlock Pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
-    Trappings.push("<B>Flintlock Pistol</B>");
-    Trappings.push("Gunpowder & shot (6)");
+                //weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
+				ItWeapons.push("<B>Flintlock pistol</B>:");
+				Trappings.push("Gunpowder & shot (6)");
+    break;   
+	case "Fwip! Fwip!":
+				ItWeapons.push("<B>Hunting bow</B>:");
+				Trappings.push("Arrows (6)");
     break;
    case "Spit Fire":
                 weapons.push("<B>Spit Fire</B>: SR% . Distance (ranged 3+[PB] yards) . Load (0 AP) . Damage (Special) . Shrapnel");
                 break;
    case "Wall Crawler":
-                weapons.push("<B>Wall Crawler Grasp</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing");
+				if (Math.random() > 0.4) {
+				weapons.push("<B>Wall Crawler Grasp</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing") 
+				} else { weapons.push("<B>Wall Crawler Spinneret</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing") };
                 break;
    case "Wind Kick":
                 weapons.push("<B>Wind Kick</B>: SR% . Distance (melee engaged) . Damage (Special) . None");
@@ -795,14 +869,14 @@ function parseTrait2Stats (TraitArray) {
                 break;
    case "Ceremonial Runes":
                 weapons.push("<B>Ceremonial Staff</B>: SM% . Distance (melee engaged or 1 yard) . Damage (CB or CB+1) . Adaptable, Pummeling, Reach");
-                Trappings.push("<B>Ceremonial Staff</B>");
+                //ItWeapons.push("Ceremonial Staff");
                 break;
     case "Murderous Attack":
-                weapons.push("<B>Garrote</B>: SM% . Distance (melee engaged) . Damage (None) . Entangling, Fast, Ineffective");
-                Trappings.push("<B>Garrote</B>");
+                //weapons.push("<B>Garrote</B>: SM% . Distance (melee engaged) . Damage (None) . Entangling, Fast, Ineffective");
+                ItWeapons.push("Garrote");
                 break;
    case "Broken Gut-plate":
-                Trappings.push("Gut-plate");
+                Armours.push("Gut-plate");
                 break;
    case "Petrifying Gaze":
                 Trappings.push("Creature Heart");
@@ -811,13 +885,23 @@ function parseTrait2Stats (TraitArray) {
                 Trappings.push("Jug of wine");
                 break;
    case "Smoke Bomb":
-                Trappings.push("Smoke Bomb");
+                ItWeapons.push("<B>Smoke Bomb</B>");
+                break;
+	case "Grenadier":
+                ItWeapons.push("<B>Glass Grenade</B>");
+                break;
+	case "Big Grim":
+                WeaponsSimple.push("<B>Splitting maul</B>");
+                WeaponsSimple.push("<B>Scythe</B>");
+                WeaponsMartial.push("<B>Pole cleaver</B>");
+                WeaponsMartial.push("<B>Zweihänder</B>");
                 break;
    case "Foul Mutation":  /*Ugly hack*/
-    for (i =0;i<RiskN;i++) {
-     var taint = Math.floor( Math.random() * TaintOfChaos.length);
-     TraitArray.push( "Taint of Chaos: " + (TaintOfChaos.splice(taint,1))[0][0]);
-    };
+    for (let j =0;j<RiskN;j++) {
+         var taint = Math.floor( Math.random() * TaintOfChaos.length);
+         //MutationArray.push( "Taint of Chaos: " + (TaintOfChaos.splice(taint,1))[0][0]);
+         MutationArray.push( (TaintOfChaos.splice(taint,1))[0][0] );
+    }
                 break;
             default:
         }
@@ -844,8 +928,9 @@ var SpeciesRoll =  Math.floor(Math.random() *  SpeciesAll.length ) +1;
 if  (SpeciesChoice>0) {
     SpeciesN = SpeciesChoice;
 } else {
-   SpeciesN = SpeciesRoll;
- };
+    SpeciesN = SpeciesRoll;
+}
+
 SpeciesTxt = SpeciesAll[ SpeciesN - 1 ];
 
 
@@ -860,7 +945,7 @@ RiskN = -1;
 
 if ( RiskN == -1 ) {
     RiskN = Math.floor(Math.random()*RiskAll.length);
-};
+}
 
 RiskName = RiskAll[RiskN ];
 
@@ -870,11 +955,11 @@ RiskName = RiskAll[RiskN ];
 //          break; 
 //};
 //NotchN = document.NotchSelection.Notch[NotchNRadio].value;
-Notch = -1;
+NotchN = -1;
 
 if ( NotchN == -1 ) {
     NotchN = Math.floor(Math.random()*NotchAll.length);
-};
+}
 
 NotchName = NotchAll[NotchN ];
 
@@ -892,22 +977,21 @@ if ( SizeN == -1 ) {
  /* Non basic are rarely small, basic are never huge*/
  if (Math.random() < (RiskN/(RiskAll.length+1))) {
   SizeN = Math.min(SizeN+1,SizeAll.length-1);
- };
- if (Math.random() > (RiskN/(RiskAll.length+1))) {
+ } else if (Math.random() > (RiskN/(RiskAll.length+1))) {
   SizeN = Math.max(SizeN-1,0);
- };
-};
+ }
+}
 
 SizeName = SizeAll[SizeN];
 
 for (i in Stats) {
     var randStat =  Math.floor(Math.random()* StatsAll [ RiskN ].length );
     Stats[i] =  StatsAll [ RiskN ].splice(randStat,1);
-};
+}
 
 for (i in Stats) {
     StatsBonus[i] =  Math.floor(Stats[i]/10);
-};
+}
 
 var StatBonusVal = StatsBonusByRisk[RiskN][NotchN];
 
@@ -916,19 +1000,19 @@ while (StatBonusVal) {
     if (StatsBonusAdvance[rand] < StatBonusMax[RiskN] ){
         StatsBonusAdvance[rand] += 1,
         StatBonusVal -= 1;
-    };
-};
+    }
+}
 
 if ( Math.random() < WeaponChance[SpeciesN - 1] ) {
     WeaponUser = 1;
  TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsWeaponUserAll[RiskN]);
  Skills = Skills.concat(SkillsWeaponUser);
-};
+}
 
 /*Abyssal creatures are almost always demons*/
 if ((SpeciesN == 1) && (Math.random() > 0.5) ){
   TraitNames.push( "Horror of the Pit" );
-};
+}
 
 for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
     var randTrait = Math.floor(Math.random() * TraitsAll[RiskN].length );
@@ -936,7 +1020,7 @@ for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
     /* Multiple exclusive trait*/
     if (Array.isArray(TraitNames[TraitNames.length-1])) {
         TraitNames[TraitNames.length-1] = TraitNames[TraitNames.length-1][ Math.floor(Math.random() * TraitNames[TraitNames.length-1].length ) ];
-    };
+    }
  if (TraitNames[TraitNames.length-1].search("#") > -1) {
   var TraitArray = TraitNames[TraitNames.length-1].split("#");
   TraitNames[TraitNames.length-1] = TraitArray[0];
@@ -945,9 +1029,9 @@ for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
   if (TraitArray.length>2) { /*Ugly hack, replace for a proper loop*/
     TraitNames.push (TraitArray[2]);
     i += 1;
-  };
- };
-};
+  }
+ }
+}
 
 var SkillVal = SkillRanks[RiskN][NotchN];
 
@@ -958,11 +1042,15 @@ if ( Math.random() < MageChance[SpeciesN - 1] ) {
     SkillVal -= SkillRanksMax[RiskN] ;
     Mage = 1;
     TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsMageAll[RiskN]);
- Trappings.push("Arcane tome with " + (SkillRanksMax[RiskN]*3) + " Petty Magick spells");
- if (SkillRanksMax[RiskN]>1) {Trappings.push("Arcane tome with " + ((SkillRanksMax[RiskN]-1)*3) + " Lesser Magick spells");};
- if (SkillRanksMax[RiskN]>2) {Trappings.push("Arcane tome with " + ((SkillRanksMax[RiskN]-2)*3) + " Greater Magick spells");};
- Trappings.push("Reagents appropriate for Magicks (" + (SkillRanksMax[RiskN]*3+3) +")");
-};
+	Trappings.push("Arcane Tome with " + (SkillRanksMax[RiskN]*3) + " Generalistic and Petty Magick spells");
+	if (SkillRanksMax[RiskN]>1) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-1)*3) + " Lesser Magick spells");}
+	if (SkillRanksMax[RiskN]>2) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-2)*3) + " Greater Magick spells");}
+	Trappings.push("Reagents appropriate for Magicks (" + (SkillRanksMax[RiskN]*3+3) +")");
+	for (let j=0; j < (SkillRanksMax[RiskN]*3); j++) { 
+	    var randSpell = Math.floor( Math.random() * GeneralistSpells.length );
+		SpellNames.push( GeneralistSpells.splice(randSpell,1)[0]);
+	}
+}
 
 TraitNames = dedupeName(TraitNames);
 TraitNames.sort();
@@ -979,50 +1067,55 @@ while (SkillVal) {
         SkillNames.push( SkillsRare.splice(randrare,1)[0] );
         SkillValues.push( randVal );
         SkillVal -= randVal;
-    };
-};
+    }
+}
 
 /* For lower risk we add couple of crappy simple weapons */
 if (RiskN == 0) {
  WeaponsSimple = WeaponsSimple.concat(WeaponsSimpleLow);
-};
+}
 
 var SkillVal = 0;
 
+var ParsedOutput = parseTrait2Stats(TraitNames);
+var ParsedMutOutput = parseTrait2Stats(MutationArray);
+ParsedOutput[0] = ParsedOutput[0].concat(ParsedMutOutput[0]);
+ParsedOutput[1] = ParsedOutput[1].concat(ParsedMutOutput[1]);
+
 if (WeaponUser) {
  var MeleeSkill = "Simple Melee";
- for (i=0;i<SkillNames.length;i++) {
-  if (SkillNames[i].includes("Melee") &&  SkillVal<SkillValues[i] ) {
-   MeleeSkill = SkillNames[i];
-   SkillVal = SkillValues[i];
+ for (let j=0;j<SkillNames.length;j++) {
+  if (SkillNames[j].includes("Melee") &&  SkillVal<SkillValues[j] ) {
+   MeleeSkill = SkillNames[j];
+   SkillVal = SkillValues[j];
   }
- };
+ }
  if (MeleeSkill == "Simple Melee") {
-  Attacks.push(WeaponsSimple[Math.floor(Math.random()*WeaponsSimple.length)]);
+  ItWeapons.push(WeaponsSimple[Math.floor(Math.random()*WeaponsSimple.length)]);
  } else {
-  Attacks.push(WeaponsMartial[Math.floor(Math.random()*WeaponsMartial.length)]);
- }; 
+  ItWeapons.push(WeaponsMartial[Math.floor(Math.random()*WeaponsMartial.length)]);
+ }
  Secondary[4] = SkillVal;
- Trappings.push(Attacks[Attacks.length-1].split(":")[0]);
- if (Math.random()>.7) {
+ //Trappings.push(Attacks[Attacks.length-1].split(":")[0]));
+ if (Math.random()> 0.7) {
 	if (MeleeSkill == "Simple Melee") {
-		Trappings.push("Leather armor");
+		Armours.push("Leather armor");
 		ArmorBonus = 1;
 	}
 	else {
-		Trappings.push("Brigandine armor");
+		Armours.push("Brigandine");
 		ArmorBonus = 3;
 	}
- };
-};
+ }
+}
 
 var DodgeVal = 0;
 
-for (i=0;i<SkillNames.length;i++) {
-  if (SkillNames[i].includes("Coordination")) {
-   DodgeVal = SkillValues[i];
-   };
-};
+for (let j=0;j<SkillNames.length;j++) {
+  if (SkillNames[j].includes("Coordination")) {
+   DodgeVal = SkillValues[j];
+   }
+}
 
 
 
@@ -1030,15 +1123,15 @@ if (SizeN < 2) {
  WeaponsNatural[SpeciesN-1] = WeaponsNatural[SpeciesN-1].concat(WeaponsNaturalLow[SpeciesN-1]);
 } else if (SizeN > 1) {
  WeaponsNatural[SpeciesN-1] = WeaponsNatural[SpeciesN-1].concat(WeaponsNaturalHigh[SpeciesN-1]);
-};
+}
 
 if (Attacks.length == 0 || Math.random()<WeaponBothChance[SpeciesN-1] ) {
  Attacks.push(WeaponsNatural[SpeciesN-1][Math.floor(Math.random()*WeaponsNatural[SpeciesN-1].length)]);
  if (RiskN>1) {
   Attacks.push(WeaponsNatural[SpeciesN-1][Math.floor(Math.random()*WeaponsNatural[SpeciesN-1].length)]);
- };
-};
-var ParsedOutput = parseTrait2Stats(TraitNames);
+ }
+}
+
 StatsBonusTrait = ParsedOutput[0];
 SecondaryBonusTrait = ParsedOutput[1];
 
@@ -1059,7 +1152,7 @@ if (StatsBonusTrait[4] < 0) {
 
 if (ParsedOutput[2].length>0) {
  Attacks.push(ParsedOutput[2][0]);
-};
+}
 
 Secondary[0] = 3 + StatsBonus[3]+StatsBonusAdvance[3]+StatsBonusTrait[3];
 Secondary[1] = 3 + StatsBonus[2]+StatsBonusAdvance[2]+StatsBonusTrait[2];
@@ -1067,7 +1160,7 @@ Secondary[2] = StatsBonus[1]+StatsBonusAdvance[1]+StatsBonusTrait[1] + ArmorBonu
 Secondary[3] = 3 + StatsBonus[5]+StatsBonusAdvance[5]+StatsBonusTrait[5];
 if (WeaponUser) {
  Secondary[4] =+ Stats[0] + (SkillVal*10);
-};
+}
 Secondary[5] =+ Stats[2] + (DodgeVal*10);
 
 /*Animals get Meat and hide*/
@@ -1076,7 +1169,7 @@ if ( SpeciesN == 2 ) {
  Trappings.push("Animal's Meat ("+ (3 + 3 * SizeN) +")");
 } else if ( SpeciesN == 3) {
  Trappings.push("Beast's Hide");
-};
+}
 
 Trappings = dedupeName(Trappings);
 Trappings.sort();
@@ -1102,14 +1195,93 @@ for (i in Secondary) {
  //   StatsTxt += "<td>" + (Secondary[i]  +SecondaryBonusTrait[i]) + (i==4||i==5?"%":"") + (i==5&&ArmorBonus==0?"<br>Natural":"") + "</td>";
 }
 //StatsTxt += "</tr></table>";
+// let TraitNames= ["Autotomy"];
 
-for (i = 0; i < TraitNames.length ; i += 1) {
- //   var MouseOverTxt = ""; /*getMouseOverText (TraitNames[i],mouseoverTraits);*/
- //    TraitTxt += "<span title = '" + MouseOverTxt + "'><B>" + TraitNames[i] + "</B></span><br>";
- //    TraitTxt +=  FindTraitDesc(TraitNames[i]) +"</br>";
+async function getTraits (TraitNames) {
+	let traitpack = game.packs.get("zweihander.zh-creature-traits");
+	let itemList;
+	await traitpack.getIndex().then(index => itemList = index);
+	
+	//console.log(itemList);
+	let traitsList = [];
+	
+	for (let j = 0; j < TraitNames.length ; j += 1) {
+		let traitItem;
+		let oldTrait = "";
+		let UglyTraits = ["Disease-ridden (INSERT DISEASE)","Hatred (INSERT ANCESTRY)","Natural Armor (VALUE 1-6)","Weak Spot (INSERT BODY PART)"];
+		for (let k = 0; k < UglyTraits.length ; k += 1) {
+			if (TraitNames[j].substring(0, 6) == UglyTraits[k].substring(0, 6)) {
+				oldTrait = TraitNames[j];
+				TraitNames[j] =  UglyTraits[k];
+				console.log(TraitNames[j] + "  ->  " +  UglyTraits[k]);
+			}
+		}
+		let searchResult = itemList.find(t => t.name == TraitNames[j]);
+		if (searchResult) {
+			traitItem = await traitpack.getDocument(searchResult._id);
+			traitItem.then;
+		}
+		if (!traitItem) {
+			console.error("No Creature Trait: " + TraitNames[j]);
+			ui.notifications.error("No Creature Trait: " + TraitNames[j] , { permanent: true });
+			continue;
+		}
+		traitItem = await traitItem.toObject();
+		if (oldTrait != ""){ 
+			traitItem.name = oldTrait;
+			oldTrait = "";
+		}
+		traitsList.push(traitItem);
+	}
+	console.log(traitsList);
+	return traitsList;
 }
 
+let traitsList = getTraits (TraitNames);
+
+
+
+async function getMutations (MutationNames) {
+	let traitpack = game.packs.get("zweihander.zh-taints");
+	let itemList;
+	await traitpack.getIndex().then(index => itemList = index);
+	
+	//console.log(itemList);
+	let traitsList = [];
+	
+	for (let j = 0; j < MutationNames.length ; j += 1) {
+		let traitItem;
+		let searchResult = itemList.find(t => t.name == MutationNames[j]);
+		if (searchResult) {
+			traitItem = await traitpack.getDocument(searchResult._id);
+			traitItem.then;
+		}
+		if (!traitItem) {
+			console.error("No Creature Taint: " + MutationNames[j]);
+			ui.notifications.error("No Creature Taint: " + MutationNames[j] , { permanent: true });
+			continue;
+		}
+		traitItem = await traitItem.toObject();
+		traitsList.push(traitItem);
+	}
+	console.log(traitsList);
+	return traitsList;
+}
+
+let mutationList = [];
+if (MutationArray.length >0){
+	let MutationNames = [];
+	for (let j = 0; j < Attacks.length ; j+= 1) {
+		MutationNames.push (MutationArray[j]);	
+	}
+	mutationList = getMutations (MutationArray);
+}
+
+
+let skillRanksObj = {};
+
 for (i = 0; i < SkillNames.length ; i += 1) {
+	skillRanksObj[SkillNames[i]] = parseInt(SkillValues[i]);
  //   var MouseOverTxt = ""; /*getMouseOverText (SkillNames[i],mouseoverSkills);*/
  //   SkillTxt += "<span title = '" + MouseOverTxt + "'>" + SkillNames[i] + ": +" + SkillValues[i]*10 + "%</span>; ";
 }
@@ -1118,50 +1290,177 @@ for (i = 0; i < Attacks.length ; i += 1) {
  //AttackProfileTxt += Attacks[i]+"<br>";
 }
 
+
+async function getAttacks (AttacksN, packname) {
+	console.log(AttacksN);
+	let attpack = game.packs.get(packname);
+	let itemList;
+	await attpack.getIndex().then(index => itemList = index);
+	
+	//console.log(itemList);
+	let attList = [];
+	
+	for (let j = 0; j < AttacksN.length ; j += 1) {
+		console.log(">>>> Looking for "+AttacksN[j]);
+		let attItem;
+		let searchResult = itemList.find(t => t.name == AttacksN[j]);
+		if (searchResult) {
+			attItem = await attpack.getDocument(searchResult._id);
+			attItem.then;
+		}
+		if (!attItem) {
+			console.error("No Creature Attack: " + AttacksN[j]);
+			ui.notifications.error("No Creature Attack: " + AttacksN[j] , { permanent: true });
+			continue;
+		}
+		attItem = await attItem.toObject();
+		attList.push(attItem);
+		console.log(">>>> Got " + attItem);
+	}
+	console.log(attList);
+	return attList;
+}
 //TrappingTxt = Trappings.join(", ");
+//Natural Attacks
 
+let attackList = [];
+let weaponList =[];
+
+if (Attacks.length >0){
+	let AttackNames = [];
+	for (let j = 0; j < Attacks.length ; j += 1) {
+		AttackNames.push (Attacks[j].split(":")[0].replace("<B>","").replace("</B>",""));	
+	}
+	attackList = getAttacks (AttackNames,"zweihander.zh-attack-profiles");
+}
+//Weapons from the game
+if (ItWeapons.length >0){
+	let AttackNames = [];
+	for (let j = 0; j < ItWeapons.length ; j += 1) {
+		AttackNames.push (ItWeapons[j].split(":")[0].replace("<B>","").replace("</B>",""));	
+	}
+	weaponList = getAttacks (AttackNames,"zweihander.zh-weapons");
+}
+
+
+async function getSpells (SpellsN, packname) {
+	console.log(SpellsN);
+	let spellpack = game.packs.get(packname);
+	let itemList;
+	await spellpack.getIndex().then(index => itemList = index);
+	
+	//console.log(itemList);
+	let spellList = [];
+	
+	for (let j = 0; j < SpellsN.length ; j += 1) {
+		console.log(">>>> Looking for "+SpellsN[j]);
+		let spellItem;
+		let searchResult = itemList.find(t => t.name == SpellsN[j]);
+		if (searchResult) {
+			spellItem = await spellpack.getDocument(searchResult._id);
+			spellItem.then;
+		}
+		if (!spellItem) {
+			console.error("No Creature Spell: " + SpellsN[j]);
+			ui.notifications.error("No Creature Spell: " + SpellsN[j] , { permanent: true });
+			continue;
+		}
+		spellItem = await spellItem.toObject();
+		spellList.push(spellItem);
+		console.log(">>>> Got " + spellItem);
+	}
+	console.log(spellList);
+	return spellList;
+}
+//TrappingTxt = Trappings.join(", ");
+//Natural Attacks
+
+let spellList = [];
+
+if (SpellNames.length >0){
+	spellList = getSpells (SpellNames,"zweihander.zh-magick");
+}
 //refreshCharacterDisplay ();
-let creaturedata = {
-	name:"Generated "+SizeName+" "+SpeciesTxt+" Creature",
-	type:"creature",
-	primaryAttributes: {
-        combat: {
-            "value": Stats[0],
-            "bonusAdvances": StatsBonusAdvance[0],
-        },
-        brawn: {
-            "value": Stats[1],
-            "bonusAdvances": StatsBonusAdvance[1],
-        },
-        agility: {
-            "value": Stats[2],
-            "bonusAdvances": StatsBonusAdvance[2],
-        },
-        perception: {
-            "value": Stats[3],
-            "bonusAdvances": StatsBonusAdvance[3],
-        },
-        intelligence: {
-            "value": Stats[4],
-            "bonusAdvances": StatsBonusAdvance[4],
-        },
-        willpower: {
-            "value": Stats[5],
-            "bonusAdvances": StatsBonusAdvance[5],
-        },
-        fellowship: {
-            "value": Stats[6],
-            "bonusAdvances": StatsBonusAdvance[7],
-        }
-    }
+//The bonusTrait data should be replaced by the proper effects.
 
+let creaturedata = {
+	name: SpeciesTxt + " " + SizeName + " " + RiskName + " " + NotchName,
+	type:"creature",
+	data : {
+		details: {
+			size: {value :SizeN},
+			riskFactor: {value: RiskN, notch: NotchN}
+		},
+		stats: {
+			primaryAttributes: {
+				combat: {
+					"value": parseInt(Stats[0]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[0])+ parseInt(StatsBonusTrait[0]),
+				},
+				brawn: {
+					"value": parseInt(Stats[1]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[1])+ parseInt(StatsBonusTrait[1]),
+				},
+				agility: {
+					"value": parseInt(Stats[2]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[2])+ parseInt(StatsBonusTrait[2]),
+				},
+				perception: {
+					"value": parseInt(Stats[3]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[3])+ parseInt(StatsBonusTrait[3]),
+				},
+				intelligence: {
+					"value": parseInt(Stats[4]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[4])+ parseInt(StatsBonusTrait[4]),
+				},
+				willpower: {
+					"value": parseInt(Stats[5]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[5])+ parseInt(StatsBonusTrait[5]),
+				},
+				fellowship: {
+					"value": parseInt(Stats[6]),
+					"bonusAdvances": parseInt(StatsBonusAdvance[6])+ parseInt(StatsBonusTrait[6]),
+				}
+			},
+		},
+		skillRanks: skillRanksObj
+	}
+	//,	items : traitsList
 };
 
-return [creaturedata,TraitNames,SkillNames,SkillValues,Trappings];
+return [creaturedata,TraitNames,traitsList, mutationList, attackList, spellList, weaponList, SkillNames,SkillValues,Trappings];
 }
 
 let creaturetotal = generateNPC(SpeciesPick);
-Actor.create(creaturetotal[0])
 
+console.log("Datos de la criatura "+ creaturetotal);
+console.log(creaturetotal[2]);
+console.log(creaturetotal[3]);
+console.log(creaturetotal[4]);
+console.log(creaturetotal[5]);
+console.log(creaturetotal[6]);
+
+let creature = Actor.create(creaturetotal[0]);
+
+let genFolders = game.folders.find(fl => fl.data.name =="Generated Creatures");
+
+//lets add the traits
+;	
+
+if (genFolders == null) { Folder.create({name:"Generated Creatures", type :"Actor"})};
+
+creature.then(cre => {
+		cre.update({folder: game.folders.getName("Generated Creatures").id});
+		cre.createEmbeddedDocuments("Item",creaturetotal[2]);
+		cre.createEmbeddedDocuments("Item",creaturetotal[3]);
+		cre.createEmbeddedDocuments("Item",creaturetotal[4]);
+		cre.createEmbeddedDocuments("Item",creaturetotal[5]);
+		cre.createEmbeddedDocuments("Item",creaturetotal[6]);
+		//creaturetotal[5].then ( obj => { if (obj.length > 0) cre.createEmbeddedDocuments("Item",obj)});
+		ChatMessage.create(
+			{content: "<p>Generating : @Actor[" + cre.id + "]{" + cre.name + "}</p><p><img width=64 height=64 src='"+cre.img+"'></p>"}, false);
+			console.log(cre);
+		}
+	);
 
 }
