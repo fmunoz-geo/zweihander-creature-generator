@@ -848,7 +848,19 @@ function parseTrait2Stats (TraitArray) {
                 //weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
 				ItWeapons.push("<B>Flintlock pistol</B>:");
 				Trappings.push("Gunpowder & shot (6)");
-    break;   
+				break;
+	case "Wytch-science":
+                //weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
+				if(Math.random() < 0.66) {
+					ItWeapons.push("<B>Wytchfyre Pistol</B>:");
+					ItWeapons.push("<B>Wytchfyre Pistol</B>:");
+				} else if(Math.random() < 0.5) {
+					ItWeapons.push("<B>Wytchfyre Jezzail</B>:");
+				} else {
+					ItWeapons.push("<B>Wytchfyre Thrower</B>:");
+				};
+				Trappings.push("Gunpowder & shot (6)");
+				break;   
 	case "Fwip! Fwip!":
 				ItWeapons.push("<B>Hunting bow</B>:");
 				Trappings.push("Arrows (6)");
