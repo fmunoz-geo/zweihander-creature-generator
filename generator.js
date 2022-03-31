@@ -10,13 +10,13 @@ Hooks.on("chatMessage", (html, content, msg) => {
     if(commands.length === 1) {
     	//let message;
       msg.content = "<p>What kind of creature do you want to generate?</p>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=-1><b>&gt; Random</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=1><b>&gt; Abyssal</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=2><b>&gt; Animal</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=3><b>&gt; Beast</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=4><b>&gt; Humanoid</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=5><b>&gt; Mutant</b></a></div>";
-      msg.content += "<div><a class='trasuregenerator-type' data-treasure-type=6><b>&gt; Supernatural</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=-1><b>&gt; Random</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=1><b>&gt; Abyssal</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=2><b>&gt; Animal</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=3><b>&gt; Beast</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=4><b>&gt; Humanoid</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=5><b>&gt; Mutant</b></a></div>";
+      msg.content += "<div><a class='creature-type' data-creature-type=6><b>&gt; Supernatural</b></a></div>";
 	  msg.content += "<p>Click above or use the command as <i>/creaturegen [type] [size] [Risk] [notch]</i></p>";
 	    if(msg) {
 	      ChatMessage.create(msg);
@@ -43,10 +43,10 @@ Hooks.on("chatMessage", (html, content, msg) => {
 });
 
 Hooks.on('renderChatLog', (log, html, data) => {
-  html.on("click", '.trasuregenerator-type', event => {
+  html.on("click", '.creature-type', event => {
     event.preventDefault();
 	//console.log(event.currentTarget);
-    zweihanderCreatureGenerator($(event.currentTarget).attr("data-trasuregenerator-type"));
+    zweihanderCreatureGenerator($(event.currentTarget).attr("data-creature-type"));
   });
 });
 
@@ -937,8 +937,8 @@ function FindTraitDesc (traitIndex) {
 
 var SpeciesRoll =  Math.floor(Math.random() *  SpeciesAll.length ) +1;
 
-if  (SpeciesChoice>0) {
-    SpeciesN = SpeciesChoice;
+if  (parseInt(SpeciesChoice)>0) {
+    SpeciesN = parseInt(SpeciesChoice);
 } else {
     SpeciesN = SpeciesRoll;
 }
