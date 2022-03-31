@@ -173,7 +173,7 @@ var TraitsBasic = [
 "Wanton Hunger",
 ["Weak Spot (Head)","Weak Spot (Body)","Weak Spot (Legs)"]];
 
-var TraitsBasicWeaponUser = ["Point Blanck","Murderous Attacks","Saddle Tactics","Shootfighting","Shotgun Bang!"];
+var TraitsBasicWeaponUser = ["Point Blank","Murderous Attacks","Saddle Tactics","Shootfighting","Shotgun Bang!"];
 var TraitsBasicMage = ["Winds of Chaos"];
 
 var TraitsIntermediate = [
@@ -203,7 +203,7 @@ var TraitsIntermediate = [
 ];
 var TraitIntermediateMage = ["Winds of Chaos","Living Chaos"];
 
-var TraitsIntermediateWeaponUser = ["Big Grim","Both- handedness","Snikt! Snikt!","Grenadier","Gift of Devils","I Got Axe for You","Murderous Attacks","Point Blanck","Saddle Tactics","Serpentine Cloak","Sharp-sighted","Shootfighting","Smoke Bomb",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
+var TraitsIntermediateWeaponUser = ["Big Grim","Both- handedness","Snikt! Snikt!","Grenadier","Gift of Devils","I Got Axe for You","Murderous Attacks","Point Blank","Saddle Tactics","Serpentine Cloak","Sharp-sighted","Shootfighting","Smoke Bomb",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
 
 var TraitsAdvanced = [
 "Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],
@@ -235,7 +235,7 @@ var TraitsAdvanced = [
 ];
 
 var TraitsAdvancedMage = ["Ætheric Domination","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways"];
-var TraitsAdvancedWeaponUser = ["Big Grim","Serpentine Cloak","Both- handedness","Gift of Devils","I Got Axe for You","Murderous Attacks","Saddle Tactics","Snikt! Snikt!","Shootfighting","Shotgun Bang!","Smoke Bomb","Sweeping Strike",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Point Blanck","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
+var TraitsAdvancedWeaponUser = ["Big Grim","Serpentine Cloak","Both- handedness","Gift of Devils","I Got Axe for You","Murderous Attacks","Saddle Tactics","Snikt! Snikt!","Shootfighting","Shotgun Bang!","Smoke Bomb","Sweeping Strike",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Point Blank","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
 
 
 
@@ -844,7 +844,7 @@ function parseTrait2Stats (TraitArray) {
                 break;
    case "Shotgun Bang!":
    case "Blam! Blam!":
-   case "Point Blanck":
+   case "Point Blank":
                 //weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
 				ItWeapons.push("<B>Flintlock pistol</B>:");
 				Trappings.push("Gunpowder & shot (6)");
@@ -1025,6 +1025,32 @@ if ( Math.random() < WeaponChance[SpeciesN - 1] ) {
 if ((SpeciesN == 1) && (Math.random() > 0.5) ){
   TraitNames.push( "Horror of the Pit" );
 }
+//Animals and Beasts have animal feet
+if ((SpeciesN == 2) && (Math.random() > 0.5) ){
+  TraitNames.push( "Paw/hoof/wing" );
+}
+if ((SpeciesN == 3) && (Math.random() > 0.5) ){
+  TraitNames.push( "Paw/hoof/wing" );
+}
+
+var SkillVal = SkillRanks[RiskN][NotchN];
+
+if ( Math.random() < MageChance[SpeciesN - 1] ) {
+    SkillNames.push("Incantation");
+    SkillValues.push( SkillRanksMax[RiskN] );
+    SkillVal -= SkillRanksMax[RiskN] ;
+    Mage = 1;
+    TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsMageAll[RiskN]);
+	Trappings.push("Arcane Tome with " + (SkillRanksMax[RiskN]*3) + " Generalistic and Petty Magick spells");
+	if (SkillRanksMax[RiskN]>1) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-1)*3) + " Lesser Magick spells");}
+	if (SkillRanksMax[RiskN]>2) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-2)*3) + " Greater Magick spells");}
+	Trappings.push("Reagents appropriate for Magicks (" + (SkillRanksMax[RiskN]*3+3) +")");
+	for (let j=0; j < (SkillRanksMax[RiskN]*3); j++) { 
+	    var randSpell = Math.floor( Math.random() * GeneralistSpells.length );
+		SpellNames.push( GeneralistSpells.splice(randSpell,1)[0]);
+	}
+}
+
 
 for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
     var randTrait = Math.floor(Math.random() * TraitsAll[RiskN].length );
@@ -1045,27 +1071,11 @@ for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
  }
 }
 
-var SkillVal = SkillRanks[RiskN][NotchN];
-
-
-if ( Math.random() < MageChance[SpeciesN - 1] ) {
-    SkillNames.push("Incantation");
-    SkillValues.push( SkillRanksMax[RiskN] );
-    SkillVal -= SkillRanksMax[RiskN] ;
-    Mage = 1;
-    TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsMageAll[RiskN]);
-	Trappings.push("Arcane Tome with " + (SkillRanksMax[RiskN]*3) + " Generalistic and Petty Magick spells");
-	if (SkillRanksMax[RiskN]>1) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-1)*3) + " Lesser Magick spells");}
-	if (SkillRanksMax[RiskN]>2) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-2)*3) + " Greater Magick spells");}
-	Trappings.push("Reagents appropriate for Magicks (" + (SkillRanksMax[RiskN]*3+3) +")");
-	for (let j=0; j < (SkillRanksMax[RiskN]*3); j++) { 
-	    var randSpell = Math.floor( Math.random() * GeneralistSpells.length );
-		SpellNames.push( GeneralistSpells.splice(randSpell,1)[0]);
-	}
-}
-
 TraitNames = dedupeName(TraitNames);
 TraitNames.sort();
+
+
+
 
 while (SkillVal) {
     var rand =  Math.floor(Math.random()* Skills.length);
