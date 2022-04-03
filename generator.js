@@ -727,197 +727,200 @@ function parseNamesAny (NamesArray,AnyNames) {
 
 
 function dedupeName(NameArray) {
-    var i;
-    var j;
+    var di;
+    var dj;
     var toremove = [];
-    for (i = 0; i< (NameArray.length - 1); i += 1) {
-        for (j = i + 1; j < (NameArray.length ) ; j += 1) {
-            if( (NameArray[i]).localeCompare(NameArray[j]) == 0) { 
-                toremove.push(j);
+    for (di = 0; di< (NameArray.length - 1); di += 1) {
+        for (dj = di + 1; dj < (NameArray.length ) ; dj += 1) {
+            if( (NameArray[di]).localeCompare(NameArray[dj]) == 0) { 
+                toremove.push(dj);
             }
         }
     }
     if (toremove.length > 0) {
-        for (i in toremove) {
-            NameArray.splice ( toremove[i] , 1);
+        for (di in toremove) {
+            NameArray.splice ( toremove[di] , 1);
         }
     }
     return NameArray;
 }
 
-function parseTrait2Stats (TraitArray) {
+function parseTrait2Stats (TArray) {
     var x;
     /* var StatsBonusName =   ["CB","BB","AB","PB","IB","WB","FB"]; */
     var stat = [0, 0, 0, 0, 0, 0, 0];
     var secondary = [0, 0, 0, 0, 0, 0, 0];
     var weapons = [];
-    for (x in TraitArray) {
-        switch (TraitArray[x]) {
-            case "Brute Strength":
-                stat[1] += 3;
-                break;
-            case "Masterfully Adroit":
-                stat[2] += 3;
-                break;
-            case "Mindless":
-                stat[4] += -10;
-                stat[5] += -10;
-                stat[6] += -10;
-                break;
+	for (let h=0; h < 2; h++){
+		if (h==1) TArray = MutationArray;
+		for (x in TArray) {
+			switch (TArray[x]) {
+				case "Brute Strength":
+					stat[1] += 3;
+					break;
+				case "Masterfully Adroit":
+					stat[2] += 3;
+					break;
+				case "Mindless":
+					stat[4] += -10;
+					stat[5] += -10;
+					stat[6] += -10;
+					break;
 
-            case "Grossly Paranoid":
-                secondary[0] += 3;
-                break;
-            case "Scar the Flesh":
-                secondary[2] += 3;
-                break;
-			case "Taint of Chaos: Albinism":
-			case "Albinism":
-                stat[0] += -9;
-				break;
-            case "Taint of Chaos: Cancerous Protection":
-            case "Cancerous Protection":
-                secondary[2] += 2;
-                break;
-			case "Taint of Chaos: Conehead":
-			case "Conehead":
-                stat[4] += -9;
-				break;
-			case "Taint of Chaos: Egghead":
-			case "Egghead":
-                stat[4] += 9;
-				break;
-			case "Taint of Chaos: Eyestalks":
-			case "Eyestalks":
-			case "Taint of Chaos: Third Eye":
-			case "Third Eye":
-                stat[3] += 9;
-				break;
-			case "Taint of Chaos: Mace-like Tail":
-			case "Mace-like Tail":
-                weapons.push("<B>Mace-like Tail</B>: SR% . Distance (melee engaged) . Load (1 AP) . Damage [CB] . Slow");
-				break;
-			case "Taint of Chaos: Moronic Mutation":
-			case "Moronic Mutation":
-                stat[5] += -9;
-				break;
-			case "Taint of Chaos: Pinhead":
-			case "Pinhead":
-                stat[3] += -3;
-                stat[4] += -3;
-                stat[5] += -3;
-				break;
-			case "Taint of Chaos: Pony Jumbo":
-			case "Pony Jumbo":
-                stat[0] += -9;
-				break;
-            case "Serpentine Cloak":
-                secondary[2] += 1;
-				Armours.push("Serpentine Cloak");
-                break;
-            case "Natural Armor (1)":
-                secondary[2] += 1;
-                break;
-            case "Natural Armor (2)":
-                secondary[2] += 2;
-                break;
-            case "Natural Armor (3)":
-                secondary[2] += 3;
-                break;
-            case "Natural Armor (4)":
-                secondary[2] += 4;
-                break;
-            case "Natural Armor (5)":
-                secondary[2] += 5;
-                break;
-            case "Natural Armor (6)":
-                secondary[2] += 6;
-                break;
-            case "Salt of the Earth":
-                secondary[3] += 3;
-                break;
-   case "Acidic Spittle":
-                weapons.push("<B>Acidic Spittle</B>: SR% . Distance (ranged 1+[PB] yards) . Load (1 AP) . Damage (Special) . None");
-                break;
-   case "Corrosive Bile":
-                weapons.push("<B>Corrosive Bile</B>: SR% . Distance (ranged 1+[PB] yards) . Load (1 AP) . Damage [CB] . Slow");
-                break;
-   case "Shotgun Bang!":
-   case "Blam! Blam!":
-   case "Point Blank":
-                //weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
-				ItWeapons.push("<B>Flintlock pistol</B>:");
-				Trappings.push("Gunpowder & shot (6)");
-				break;
-	case "Wytch-science":
-                //weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
-				if(Math.random() < 0.66) {
-					ItWeapons.push("<B>Wytchfyre Pistol</B>:");
-					ItWeapons.push("<B>Wytchfyre Pistol</B>:");
-				} else if(Math.random() < 0.5) {
-					ItWeapons.push("<B>Wytchfyre Jezzail</B>:");
-				} else {
-					ItWeapons.push("<B>Wytchfyre Thrower</B>:");
-				};
-				Trappings.push("Gunpowder & shot (6)");
-				break;   
-	case "Fwip! Fwip!":
-				ItWeapons.push("<B>Hunting bow</B>:");
-				Trappings.push("Arrows (6)");
-    break;
-   case "Spit Fire":
-                weapons.push("<B>Spit Fire</B>: SR% . Distance (ranged 3+[PB] yards) . Load (0 AP) . Damage (Special) . Shrapnel");
-                break;
-   case "Wall Crawler":
-				if (Math.random() > 0.4) {
-				weapons.push("<B>Wall Crawler Grasp</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing") 
-				} else { weapons.push("<B>Wall Crawler Spinneret</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing") };
-                break;
-   case "Wind Kick":
-                weapons.push("<B>Wind Kick</B>: SR% . Distance (melee engaged) . Damage (Special) . None");
-                break;
-   case "Flailing Tentacles":
-                weapons.push("<B>Tentacles</B>: SM% . Distance (melee engaged or 3+[PB] yards) . Damage [CB] . Powerful, Reach");
-                break;
-   case "Ceremonial Runes":
-                weapons.push("<B>Ceremonial Staff</B>: SM% . Distance (melee engaged or 1 yard) . Damage (CB or CB+1) . Adaptable, Pummeling, Reach");
-                //ItWeapons.push("Ceremonial Staff");
-                break;
-    case "Murderous Attack":
-                //weapons.push("<B>Garrote</B>: SM% . Distance (melee engaged) . Damage (None) . Entangling, Fast, Ineffective");
-                ItWeapons.push("Garrote");
-                break;
-   case "Broken Gut-plate":
-                Armours.push("Gut-plate");
-                break;
-   case "Petrifying Gaze":
-                Trappings.push("Creature Heart");
-                break;
-   case "Dionysian Delights":
-                Trappings.push("Jug of wine");
-                break;
-   case "Smoke Bomb":
-                ItWeapons.push("<B>Smoke Bomb</B>");
-                break;
-	case "Grenadier":
-                ItWeapons.push("<B>Glass Grenade</B>");
-                break;
-	case "Big Grim":
-                WeaponsSimple.push("<B>Splitting maul</B>");
-                WeaponsSimple.push("<B>Scythe</B>");
-                WeaponsMartial.push("<B>Pole cleaver</B>");
-                WeaponsMartial.push("<B>Zweihänder</B>");
-                break;
-   case "Foul Mutation":  /*Ugly hack*/
-    for (let j =0;j<RiskN;j++) {
-         var taint = Math.floor( Math.random() * TaintOfChaos.length);
-         //MutationArray.push( "Taint of Chaos: " + (TaintOfChaos.splice(taint,1))[0][0]);
-         MutationArray.push( (TaintOfChaos.splice(taint,1))[0][0] );
-    }
-                break;
-            default:
-        }
-    }
+				case "Grossly Paranoid":
+					secondary[0] += 3;
+					break;
+				case "Scar the Flesh":
+					secondary[2] += 3;
+					break;
+				case "Taint of Chaos: Albinism":
+				case "Albinism":
+					stat[0] += -9;
+					break;
+				case "Taint of Chaos: Cancerous Protection":
+				case "Cancerous Protection":
+					secondary[2] += 2;
+					break;
+				case "Taint of Chaos: Conehead":
+				case "Conehead":
+					stat[4] += -9;
+					break;
+				case "Taint of Chaos: Egghead":
+				case "Egghead":
+					stat[4] += 9;
+					break;
+				case "Taint of Chaos: Eyestalks":
+				case "Eyestalks":
+				case "Taint of Chaos: Third Eye":
+				case "Third Eye":
+					stat[3] += 9;
+					break;
+				case "Taint of Chaos: Mace-like Tail":
+				case "Mace-like Tail":
+					weapons.push("<B>Mace-like Tail</B>: SR% . Distance (melee engaged) . Load (1 AP) . Damage [CB] . Slow");
+					break;
+				case "Taint of Chaos: Moronic Mutation":
+				case "Moronic Mutation":
+					stat[5] += -9;
+					break;
+				case "Taint of Chaos: Pinhead":
+				case "Pinhead":
+					stat[3] += -3;
+					stat[4] += -3;
+					stat[5] += -3;
+					break;
+				case "Taint of Chaos: Pony Jumbo":
+				case "Pony Jumbo":
+					stat[0] += -9;
+					break;
+				case "Serpentine Cloak":
+					secondary[2] += 1;
+					Armours.push("Serpentine Cloak");
+					break;
+				case "Natural Armor (1)":
+					secondary[2] += 1;
+					break;
+				case "Natural Armor (2)":
+					secondary[2] += 2;
+					break;
+				case "Natural Armor (3)":
+					secondary[2] += 3;
+					break;
+				case "Natural Armor (4)":
+					secondary[2] += 4;
+					break;
+				case "Natural Armor (5)":
+					secondary[2] += 5;
+					break;
+				case "Natural Armor (6)":
+					secondary[2] += 6;
+					break;
+				case "Salt of the Earth":
+					secondary[3] += 3;
+					break;
+	   case "Acidic Spittle":
+					weapons.push("<B>Acidic Spittle</B>: SR% . Distance (ranged 1+[PB] yards) . Load (1 AP) . Damage (Special) . None");
+					break;
+	   case "Corrosive Bile":
+					weapons.push("<B>Corrosive Bile</B>: SR% . Distance (ranged 1+[PB] yards) . Load (1 AP) . Damage [CB] . Slow");
+					break;
+	   case "Shotgun Bang!":
+	   case "Blam! Blam!":
+	   case "Point Blank":
+					//weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
+					ItWeapons.push("<B>Flintlock pistol</B>:");
+					Trappings.push("Gunpowder & shot (6)");
+					break;
+		case "Wytch-science":
+					//weapons.push("<B>Flintlock pistol</B>: SR% . Distance (ranged 7 yards) . Load (3 AP) • Damage (5) . Gunpowder, Volatile");
+					if(Math.random() < 0.66) {
+						ItWeapons.push("<B>Wytchfyre Pistol</B>:");
+						ItWeapons.push("<B>Wytchfyre Pistol</B>:");
+					} else if(Math.random() < 0.5) {
+						ItWeapons.push("<B>Wytchfyre Jezzail</B>:");
+					} else {
+						ItWeapons.push("<B>Wytchfyre Thrower</B>:");
+					};
+					Trappings.push("Gunpowder & shot (6)");
+					break;   
+		case "Fwip! Fwip!":
+					ItWeapons.push("<B>Hunting bow</B>:");
+					Trappings.push("Arrows (6)");
+		break;
+	   case "Spit Fire":
+					weapons.push("<B>Spit Fire</B>: SR% . Distance (ranged 3+[PB] yards) . Load (0 AP) . Damage (Special) . Shrapnel");
+					break;
+	   case "Wall Crawler":
+					if (Math.random() > 0.4) {
+					weapons.push("<B>Wall Crawler Grasp</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing") 
+					} else { weapons.push("<B>Wall Crawler Spinneret</B>: SM% . Distance (ranged 3+[PB] yards) . Load (1 AP) . Damage (None) . Entangling, Ineffective, Throwing") };
+					break;
+	   case "Wind Kick":
+					weapons.push("<B>Wind Kick</B>: SR% . Distance (melee engaged) . Damage (Special) . None");
+					break;
+	   case "Flailing Tentacles":
+					weapons.push("<B>Tentacles</B>: SM% . Distance (melee engaged or 3+[PB] yards) . Damage [CB] . Powerful, Reach");
+					break;
+	   case "Ceremonial Runes":
+					weapons.push("<B>Ceremonial Staff</B>: SM% . Distance (melee engaged or 1 yard) . Damage (CB or CB+1) . Adaptable, Pummeling, Reach");
+					//ItWeapons.push("Ceremonial Staff");
+					break;
+		case "Murderous Attack":
+					//weapons.push("<B>Garrote</B>: SM% . Distance (melee engaged) . Damage (None) . Entangling, Fast, Ineffective");
+					ItWeapons.push("Garrote");
+					break;
+	   case "Broken Gut-plate":
+					Armours.push("Gut-plate");
+					break;
+	   case "Petrifying Gaze":
+					Trappings.push("Creature Heart");
+					break;
+	   case "Dionysian Delights":
+					Trappings.push("Jug of wine");
+					break;
+	   case "Smoke Bomb":
+					ItWeapons.push("<B>Smoke Bomb</B>");
+					break;
+		case "Grenadier":
+					ItWeapons.push("<B>Glass Grenade</B>");
+					break;
+		case "Big Grim":
+					WeaponsSimple.push("<B>Splitting maul</B>");
+					WeaponsSimple.push("<B>Scythe</B>");
+					WeaponsMartial.push("<B>Pole cleaver</B>");
+					WeaponsMartial.push("<B>Zweihänder</B>");
+					break;
+	   case "Foul Mutation":  /*Ugly hack*/
+					for (let j =0;j<RiskN;j++) {
+						 var taint = Math.floor( Math.random() * TaintOfChaos.length);
+						 //MutationArray.push( "Taint of Chaos: " + (TaintOfChaos.splice(taint,1))[0][0]);
+						 MutationArray.push( (TaintOfChaos.splice(taint,1))[0][0] );
+					}
+					break;
+				default:
+			}
+		}
+	}
     return [stat,secondary,weapons];
 }
 
@@ -1026,10 +1029,10 @@ if ((SpeciesN == 1) && (Math.random() > 0.5) ){
   TraitNames.push( "Horror of the Pit" );
 }
 //Animals and Beasts have animal feet
-if ((SpeciesN == 2) && (Math.random() > 0.5) ){
+if ((SpeciesN == 2) && (Math.random() > 0.3) ){
   TraitNames.push( "Paw/hoof/wing" );
 }
-if ((SpeciesN == 3) && (Math.random() > 0.5) ){
+if ((SpeciesN == 3) && (Math.random() > 0.4) ){
   TraitNames.push( "Paw/hoof/wing" );
 }
 
@@ -1100,9 +1103,9 @@ if (RiskN == 0) {
 var SkillVal = 0;
 
 var ParsedOutput = parseTrait2Stats(TraitNames);
-var ParsedMutOutput = parseTrait2Stats(MutationArray);
-ParsedOutput[0] = ParsedOutput[0].concat(ParsedMutOutput[0]);
-ParsedOutput[1] = ParsedOutput[1].concat(ParsedMutOutput[1]);
+//var ParsedMutOutput = parseTrait2Stats(MutationArray);
+//ParsedOutput[0] = ParsedOutput[0].concat(ParsedMutOutput[0]);
+//ParsedOutput[1] = ParsedOutput[1].concat(ParsedMutOutput[1]);
 
 if (WeaponUser) {
  var MeleeSkill = "Simple Melee";
@@ -1322,17 +1325,17 @@ async function getAttacks (AttacksN, packname) {
 	//console.log(itemList);
 	let attList = [];
 	
-	for (let j = 0; j < AttacksN.length ; j += 1) {
-		console.log(">>>> Looking for "+AttacksN[j]);
+	for (let aj = 0; aj < AttacksN.length ; aj += 1) {
+		console.log(">>>> Looking for "+AttacksN[aj]);
 		let attItem;
-		let searchResult = itemList.find(t => t.name == AttacksN[j]);
+		let searchResult = itemList.find(t => t.name == AttacksN[aj]);
 		if (searchResult) {
 			attItem = await attpack.getDocument(searchResult._id);
 			attItem.then;
 		}
 		if (!attItem) {
-			console.error("No Creature Attack: " + AttacksN[j]);
-			ui.notifications.error("No Creature Attack: " + AttacksN[j] , { permanent: true });
+			console.error("No Creature Attack: " + AttacksN[aj]);
+			ui.notifications.error("No Creature Attack: " + AttacksN[aj] , { permanent: true });
 			continue;
 		}
 		attItem = await attItem.toObject();
@@ -1412,6 +1415,9 @@ let creaturedata = {
 		details: {
 			size: {value :SizeN},
 			riskFactor: {value: RiskN, notch: NotchN}
+		},
+		flavor: {
+			description: "Generator Web version: https://pacomiscelaneousstuff.blogspot.com/2019/09/zweihander-monster-generator.html"
 		},
 		stats: {
 			primaryAttributes: {
