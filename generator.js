@@ -474,9 +474,10 @@ var WeaponsSimpleLow = [
 ];
 
 var WeaponsMartial = [
-"<B>Sabre</B>: : MM% . Distance (melee engaged) . Damage [CB] . Defensive",
-"<B>Morgenstern</B>: : MM% . Distance (melee engaged) . Damage [CB] . Adaptable, Powerful, Vicious",
-"<B>Battle axe</B>: : MM% . Distance (melee engaged or 1 yard) . Damage [CB] . Adaptable, Reach, Slow, Vicious"
+"<B>Sabre</B>: MM% . Distance (melee engaged) . Damage [CB] . Defensive",
+"<B>Mortuary Sword</B>: MM% . Distance (melee engaged) . Damage [CB] . Vicious",
+"<B>Morgenstern</B>: MM% . Distance (melee engaged) . Damage [CB] . Adaptable, Powerful, Vicious",
+"<B>Battle axe</B>: MM% . Distance (melee engaged or 1 yard) . Damage [CB] . Adaptable, Reach, Slow, Vicious"
 ];
 
 var Attacks = [];
@@ -1220,7 +1221,6 @@ for (i in Secondary) {
  //   StatsTxt += "<td>" + (Secondary[i]  +SecondaryBonusTrait[i]) + (i==4||i==5?"%":"") + (i==5&&ArmorBonus==0?"<br>Natural":"") + "</td>";
 }
 //StatsTxt += "</tr></table>";
-// let TraitNames= ["Autotomy"];
 
 async function getTraits (TraitNames) {
 	let traitpack = game.packs.get("zweihander.zh-creature-traits");
