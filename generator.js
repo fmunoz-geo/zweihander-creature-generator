@@ -104,9 +104,9 @@ var SpeciesN;
 var SpeciesAll = ["Abyssal","Animal","Beast","Humanoid","Mutant","Supernatural"];
 
 /*Chance to use simple or martial weapons*/
-var WeaponChance = [0.5, 0.1, 0.1, 0.8, 0.6, 0.5];
+var WeaponChance = [0.5, 0.0, 0.1, 0.8, 0.6, 0.5];
 /*Chance of having Natural attack with the weapon*/
-var WeaponBothChance = [0.9, 0.9, 0.9, 0.2, 0.6, 0.5];
+var WeaponBothChance = [0.9, 0.9, 0.9, 0.2, 0.2, 0.5];
 /*Chance to be a magic user*/
 var MageChance   = [0.2, 0.1, 0.3, 0.1, 0.2, 0.3];
 var Mage = 0;
@@ -152,8 +152,26 @@ var Armours = [];
 var ItWeapons = [];
 
 var TraitsByRisk = [[2,3,4,4],[6,7,8,8],[10,11,12,12],[10,11,12,12]];
+
+/*
+var TraitsSpecies = [
+//Abysal
+[],
+//Animal
+[],
+//Beast
+[],
+//Humanoid
+[],
+//Mutant
+[],
+//Supernatural
+[]
+];
+*/
+
 var TraitsBasic = [
-"Accursed","Ambush Tactics","Autotomy","Aversion to Light","Battle Frenzy","Blitz",
+"Accursed","Ambush Tactics","Autotomy","Aversion to Light#Dark Sense","Battle Frenzy","Blitz",
 ["Bloodless","Hangin’ Tough"],"Bloodlust","Bog Stench","Chomp","Chthonian Dweller","Creepy Crawlies",
 ["Dark Sense","Fey Sight"],"Dense Anatomy","Dionysian Delights","Disease-ridden (INSERT DISEASE)","Faces of Death","Fast on Their Feet", 
 ["Feckless Runt","Herp Derp","Mindless","Sniveling Whelp","Steely Fortitude"],
@@ -162,7 +180,7 @@ var TraitsBasic = [
 "Foul Mutation","Lick Your Wounds","Menacing",
 ["Natural Armor (1)","Natural Armor (1)","Natural Armor (3)","Natural Armor (5)","Scar the Flesh"],
 "One-two Punch","Pack Mentality",
-["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings"],
+["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings","Paw/hoof/wing#Weak Spot (Wings)"],
 "Perfect Camouflage",
 ["Petrifying Gaze","Petrifying Gaze#Eyes Wide Shut"],
 "Poison Resistance",
@@ -179,7 +197,7 @@ var TraitsBasicMage = ["Winds of Chaos"];
 var TraitsIntermediate = [
 "Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],
 ["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],"Ambush Tactics",
-"Arcana of Horror","Autotomy","Aversion to Light","Bane of Lycanthropes","Battle Frenzy",
+"Arcana of Horror","Autotomy","Aversion to Light#Dark Sense","Bane of Lycanthropes","Battle Frenzy",
 "Blitz",
 ["Bloodless","Hangin’ Tough"],"Bloodlust","Bog Stench","Broken Gut-plate",
 ["Brute Strength","Brute Strength#Hideous Might","Masterfully Adroit","Masterfully Adroit"],"Brush With Death",
@@ -201,13 +219,13 @@ var TraitsIntermediate = [
 "Unruly",
 ["Weak Spot (Head)","Weak Spot (Body)","Weak Spot (Legs)"]
 ];
-var TraitIntermediateMage = ["Winds of Chaos","Living Chaos"];
+var TraitIntermediateMage = ["Winds of Chaos","Living Chaos","Gift of Devils"];
 
 var TraitsIntermediateWeaponUser = ["Big Grim","Both- handedness","Snikt! Snikt!","Grenadier","Gift of Devils","I Got Axe for You","Murderous Attacks","Point Blank","Saddle Tactics","Serpentine Cloak","Sharp-sighted","Shootfighting","Smoke Bomb",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
 
 var TraitsAdvanced = [
 "Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],
-"Ambush Tactics","Arcana of Horror","Autotomy","Aversion to Light","Battle Frenzy",
+"Ambush Tactics","Arcana of Horror","Autotomy","Aversion to Light#Dark Sense","Battle Frenzy",
 "Blitz",
 ["Bloodless","Hangin’ Tough"],"Bloodlust",
 ["Brute Strength","Brute Strength#Hideous Might","Masterfully Adroit","Masterfully Adroit"],
@@ -221,7 +239,7 @@ var TraitsAdvanced = [
 "Fetid Weaponry", 
 ["Hatred (Humans)","Hatred (Dwarves)","Hatred (Elves)","Hatred (Gnomes)","Hatred (Ogres)"],
 "Foul Mutation","Grossly Paranoid","Hard-nosed",
-"Impish Delights","Implacable Defense","Lick Your Wounds",["Menacing","Monstruous Bellow","Primal Scream"],
+"Impish Delights","Implacable Defense","Lick Your Wounds",["Menacing","Monstrous Bellow","Primal Scream"],
 ["Mindless","Steely Fortitude","Feckless Runt"],
 ["Natural Armor (2)","Natural Armor (4)","Natural Armor (6)","Scar the Flesh"],
 "One-two Punch","Pack Mentality",["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings","Paw/hoof/wing#Broken Wings#Strafing Talons"],"Perfect Camouflage",
@@ -234,14 +252,14 @@ var TraitsAdvanced = [
 ["Weak Spot (Head)","Weak Spot (Body)","Weak Spot (Legs)"]
 ];
 
-var TraitsAdvancedMage = ["Ætheric Domination","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways"];
+var TraitsAdvancedMage = ["Ætheric Domination","Ceremonial Runes","Winds of Chaos","Living Chaos","The Changer of Ways","Gift of Devils"];
 var TraitsAdvancedWeaponUser = ["Big Grim","Serpentine Cloak","Both- handedness","Gift of Devils","I Got Axe for You","Murderous Attacks","Saddle Tactics","Snikt! Snikt!","Shootfighting","Shotgun Bang!","Smoke Bomb","Sweeping Strike",["Blam! Blam!","Blam!Blam!#Shotgun Bang!","Shotgun Bang!","Point Blank","Fwip! Fwip!","Fwip! Fwip!"],"Wytch-science"];
 
 
 
 var TraitsElite = [
 "Accursed",["Acidic Spittle","Gastric Acidity","Acidic Spittle#Gastric Acidity"],["Æthereal Form","Æthereal Form#Bonds of Death","Æthereal Form#Bonds of Death"],
-"Ambush Tactics","Arcana of Horror","Autotomy","Aversion to Light","Battle Frenzy",
+"Ambush Tactics","Arcana of Horror","Autotomy","Aversion to Light#Dark Sense","Battle Frenzy",
 "Blitz",
 ["Bloodless","Hangin’ Tough"],"Bloodlust",
 ["Brute Strength","Brute Strength#Hideous Might","Masterfully Adroit","Masterfully Adroit"],
@@ -255,7 +273,7 @@ var TraitsElite = [
 "Fetid Weaponry", 
 ["Hatred (Humans)","Hatred (Dwarves)","Hatred (Elves)","Hatred (Gnomes)","Hatred (Ogres)"],
 "Foul Mutation","Grossly Paranoid","Hard-nosed",
-"Impish Delights","Implacable Defense","Lick Your Wounds",["Menacing","Monstruous Bellow","Primal Scream"],
+"Impish Delights","Implacable Defense","Lick Your Wounds",["Menacing","Monstrous Bellow","Primal Scream"],
 ["Mindless","Steely Fortitude","Feckless Runt"],
 ["Natural Armor (2)","Natural Armor (4)","Natural Armor (6)","Scar the Flesh"],
 "One-two Punch","Pack Mentality",["Paw/hoof/wing","Paw/hoof/wing","Paw/hoof/wing#Broken Wings","Paw/hoof/wing#Broken Wings#Strafing Talons"],"Perfect Camouflage",
@@ -453,14 +471,15 @@ var TraitDescription = [
 var SkillRanks = [[4,7,10,10],[14,17,20,20],[24,27,30,30],[24,27,30,30]];
 var SkillRanksMax = [1,2,3,3];
 
-var Skills = ["Athletics","Awareness","Charm","Coordination","Eavesdrop","Intimidate","Navigation","Resolve","Rumor","Scrutinize","Simple Melee","Simple Ranged","Stealth","Survival","Toughness"];
+var SkillsDumb = ["Athletics","Awareness","Coordination","Eavesdrop","Guile","Intimidate","Resolve","Scrutinize","Simple Melee","Simple Ranged","Stealth","Survival","Toughness"];
+var Skills = ["Athletics","Awareness","Charm","Coordination","Eavesdrop","Guile","Intimidate","Navigation","Resolve","Rumor","Scrutinize","Simple Melee","Simple Ranged","Stealth","Survival","Toughness"];
 /*For non mosnter*/
-var SkillsRare = ["Alchemy","Bargain", "Counterfeit","Disguise","Drive","Education","Folklore","Gamble","Guile","Heal", "Interrogation","Leadership","Pilot","Ride","Skulduggery","Tradecraft", "Warfare"];
+var SkillsRare = ["Alchemy","Bargain", "Counterfeit","Disguise","Drive","Education","Folklore","Gamble","Heal", "Interrogation","Leadership","Pilot","Ride","Skulduggery","Tradecraft", "Warfare"];
 var SkillsWeaponUser = ["Martial Melee","Martial Ranged"];
 var SkillNames = [];
 var SkillValues = [];
 var SkillTxt = "";
-var StatsRareChance   = [0.1, 0.05, 0.05, 0.2, 0.15, 0.15];
+var StatsRareChance   = [0.1, 0.02, 0.05, 0.2, 0.15, 0.15];
 var WeaponsSimple = [
 "<B>Rondel Dagger</B>: SM% . Distance (melee engaged) . Damage [CB] . Fast, Vicious, Weak",
 "<B>Dirk</B>: SM% . Distance (melee engaged) . Damage [AB] . Fast,Finesse, Light, Weak",
@@ -731,18 +750,20 @@ function dedupeName(NameArray) {
     var di;
     var dj;
     var toremove = [];
-    for (di = 0; di< (NameArray.length - 1); di += 1) {
-        for (dj = di + 1; dj < (NameArray.length ) ; dj += 1) {
-            if( (NameArray[di]).localeCompare(NameArray[dj]) == 0) { 
-                toremove.push(dj);
-            }
-        }
-    }
-    if (toremove.length > 0) {
-        for (di in toremove) {
-            NameArray.splice ( toremove[di] , 1);
-        }
-    }
+	if (NameArray.length > 1) {
+		for (di = 0; di < (NameArray.length - 1); di += 1) {
+			for (dj = di + 1; dj < (NameArray.length ) ; dj += 1) {
+				if( (NameArray[di]).localeCompare(NameArray[dj]) == 0) { 
+					toremove.push(dj);
+				}
+			}
+		}
+		if (toremove.length > 0) {
+			for (di in toremove) {
+				NameArray.splice ( toremove[di] , 1);
+			}
+		}
+	}
     return NameArray;
 }
 
@@ -905,6 +926,15 @@ function parseTrait2Stats (TArray) {
 		case "Grenadier":
 					ItWeapons.push("<B>Glass Grenade</B>");
 					break;
+		case "I Got Axe for You":
+					if(Math.random() < 0.6) {
+						ItWeapons.push("<B>Francisca</B>");
+					} else if (Math.random() < 0.75) {
+						ItWeapons.push("<B>Throwing knife</B>");
+					} else {
+						ItWeapons.push("<B>Net</B>");
+					}
+					break;
 		case "Big Grim":
 					WeaponsSimple.push("<B>Splitting maul</B>");
 					WeaponsSimple.push("<B>Scythe</B>");
@@ -1019,16 +1049,18 @@ while (StatBonusVal) {
     }
 }
 
-if ( Math.random() < WeaponChance[SpeciesN - 1] ) {
-    WeaponUser = 1;
- TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsWeaponUserAll[RiskN]);
- Skills = Skills.concat(SkillsWeaponUser);
+
+/*Abyssal creatures are almost always demons and see in the dark*/
+if ((SpeciesN == 1) && (Math.random() > 0.3) ){
+	TraitNames.push( "Horror of the Pit" );
+	TraitNames.push( "Dark Sense" );
+	if (Math.random() > 0.2) {
+		TraitNames.push( "Call of the Abyss" );
+	}
+} else {
+	TraitNames.push( "Fey Sight" );
 }
 
-/*Abyssal creatures are almost always demons*/
-if ((SpeciesN == 1) && (Math.random() > 0.5) ){
-  TraitNames.push( "Horror of the Pit" );
-}
 //Animals and Beasts have animal feet
 if ((SpeciesN == 2) && (Math.random() > 0.3) ){
   TraitNames.push( "Paw/hoof/wing" );
@@ -1036,6 +1068,30 @@ if ((SpeciesN == 2) && (Math.random() > 0.3) ){
 if ((SpeciesN == 3) && (Math.random() > 0.4) ){
   TraitNames.push( "Paw/hoof/wing" );
 }
+if ((SpeciesN == 2) && (Math.random() > 0.4) ){
+  TraitNames.push( "Fetid Weaponry" );
+}
+
+//Most mutants see in the dark
+if ((SpeciesN == 4) && (Math.random() > 0.4) ){
+  TraitNames.push( "Dark Sense" );
+}
+
+//Animals are dumb
+if ((SpeciesN == 2) && (Math.random() > 0.1) ){
+  Skills = SkillsDumb;
+}
+if ((SpeciesN == 3) && (Math.random() > 0.5) ){
+  Skills = SkillsDumb;
+}
+
+
+if ( Math.random() < WeaponChance[SpeciesN - 1] ) {
+    WeaponUser = 1;
+ TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsWeaponUserAll[RiskN]);
+ Skills = Skills.concat(SkillsWeaponUser);
+}
+
 
 var SkillVal = SkillRanks[RiskN][NotchN];
 
@@ -1055,11 +1111,11 @@ if ( Math.random() < MageChance[SpeciesN - 1] ) {
 	}
 }
 
-
+/*
 for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
     var randTrait = Math.floor(Math.random() * TraitsAll[RiskN].length );
     TraitNames.push( TraitsAll[RiskN].splice(randTrait,1)[0]);
-    /* Multiple exclusive trait*/
+    // Multiple exclusive trait
     if (Array.isArray(TraitNames[TraitNames.length-1])) {
         TraitNames[TraitNames.length-1] = TraitNames[TraitNames.length-1][ Math.floor(Math.random() * TraitNames[TraitNames.length-1].length ) ];
     }
@@ -1068,11 +1124,30 @@ for (i=TraitNames.length; i<TraitsByRisk[ RiskN ][NotchN]; i++) {
   TraitNames[TraitNames.length-1] = TraitArray[0];
   TraitNames.push (TraitArray[1]);
   i += 1;
-  if (TraitArray.length>2) { /*Ugly hack, replace for a proper loop*/
+  if (TraitArray.length>2) { //Ugly hack, replace for a proper loop
     TraitNames.push (TraitArray[2]);
     i += 1;
   }
  }
+}
+*/
+while (TraitNames.length < TraitsByRisk[ RiskN ][NotchN]){
+    var randTrait = Math.floor(Math.random() * TraitsAll[RiskN].length );
+    TraitNames.push( TraitsAll[RiskN].splice(randTrait,1)[0]);
+	// Multiple exclusive trait
+	if (Array.isArray(TraitNames[TraitNames.length-1])) {
+        TraitNames[TraitNames.length-1] = TraitNames[TraitNames.length-1][ Math.floor(Math.random() * TraitNames[TraitNames.length-1].length ) ];
+    }
+	if (TraitNames[TraitNames.length-1].search("#") > -1) {
+	  var TraitArray = TraitNames[TraitNames.length-1].split("#");
+	  TraitNames[TraitNames.length-1] = TraitArray.splice(0,1)[0];
+	  //TraitNames.push (TraitArray[0,1]);
+	  while (TraitArray.length>0) { //Ugly hack, replace for a proper loop
+		TraitNames.push (TraitArray.splice(0,1)[0]);
+	  }
+	}
+	console.log(TraitNames);
+	TraitNames = dedupeName(TraitNames);
 }
 
 TraitNames = dedupeName(TraitNames);
@@ -1085,7 +1160,7 @@ while (SkillVal) {
     var rand =  Math.floor(Math.random()* Skills.length);
     var randrare =  Math.floor(Math.random()* SkillsRare.length);
     var randVal =  Math.min( Math.floor(Math.random()*  SkillRanksMax[RiskN] ) + 1, SkillVal );
-    if ((Math.random()> StatsRareChance [ RiskN -1]) && (Skills.length > 0)) {
+    if ((Math.random() < StatsRareChance [ SpeciesN -1]) || (Skills.length > 0)) {
         SkillNames.push( Skills.splice(rand,1)[0]);
         SkillValues.push( randVal );
         SkillVal -= randVal;
@@ -1151,10 +1226,10 @@ if (SizeN < 2) {
  WeaponsNatural[SpeciesN-1] = WeaponsNatural[SpeciesN-1].concat(WeaponsNaturalHigh[SpeciesN-1]);
 }
 
-if (Attacks.length == 0 || Math.random()<WeaponBothChance[SpeciesN-1] ) {
- Attacks.push(WeaponsNatural[SpeciesN-1][Math.floor(Math.random()*WeaponsNatural[SpeciesN-1].length)]);
- if (RiskN>1) {
-  Attacks.push(WeaponsNatural[SpeciesN-1][Math.floor(Math.random()*WeaponsNatural[SpeciesN-1].length)]);
+if ( WeaponUser == 0 || Math.random() < WeaponBothChance[SpeciesN-1] ) {
+ Attacks.push(WeaponsNatural[SpeciesN-1][Math.floor(Math.random() * WeaponsNatural[SpeciesN-1].length)]);
+ if (RiskN > 1) {
+  Attacks.push(WeaponsNatural[SpeciesN-1][Math.floor(Math.random() * WeaponsNatural[SpeciesN-1].length)]);
  }
 }
 
