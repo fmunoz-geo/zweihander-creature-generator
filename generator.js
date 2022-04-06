@@ -494,7 +494,7 @@ var WeaponsSimpleLow = [
 
 var WeaponsMartial = [
 "<B>Sabre</B>: MM% . Distance (melee engaged) . Damage [CB] . Defensive",
-"<B>Mortuary Sword</B>: MM% . Distance (melee engaged) . Damage [CB] . Vicious",
+"<B>Mortuary sword</B>: MM% . Distance (melee engaged) . Damage [CB] . Vicious",
 "<B>Morgenstern</B>: MM% . Distance (melee engaged) . Damage [CB] . Adaptable, Powerful, Vicious",
 "<B>Battle axe</B>: MM% . Distance (melee engaged or 1 yard) . Damage [CB] . Adaptable, Reach, Slow, Vicious"
 ];
