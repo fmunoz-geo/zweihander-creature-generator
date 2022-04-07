@@ -474,7 +474,8 @@ var SkillRanksMax = [1,2,3,3];
 var SkillsDumb = ["Athletics","Awareness","Coordination","Eavesdrop","Guile","Intimidate","Resolve","Scrutinize","Simple Melee","Simple Ranged","Stealth","Survival","Toughness"];
 var Skills = ["Athletics","Awareness","Charm","Coordination","Eavesdrop","Guile","Intimidate","Navigation","Resolve","Rumor","Scrutinize","Simple Melee","Simple Ranged","Stealth","Survival","Toughness"];
 /*For non mosnter*/
-var SkillsRare = ["Alchemy","Bargain", "Counterfeit","Disguise","Drive","Education","Folklore","Gamble","Heal", "Interrogation","Leadership","Pilot","Ride","Skulduggery","Tradecraft", "Warfare"];
+//Alchemy and Incantation just for Mages. Maybe Warfare for Martial users?
+var SkillsRare = ["Bargain", "Counterfeit","Disguise","Drive","Education","Folklore","Gamble","Heal", "Interrogation","Leadership","Pilot","Ride","Skulduggery","Tradecraft", "Warfare"];
 var SkillsWeaponUser = ["Martial Melee","Martial Ranged"];
 var SkillNames = [];
 var SkillValues = [];
@@ -911,6 +912,9 @@ function parseTrait2Stats (TArray) {
 					//weapons.push("<B>Garrote</B>: SM% . Distance (melee engaged) . Damage (None) . Entangling, Fast, Ineffective");
 					ItWeapons.push("Garrote");
 					break;
+	   case "Battle Frenzy":
+					Armours.push("Red Cap Mushroom");
+					break;
 	   case "Broken Gut-plate":
 					Armours.push("Gut-plate");
 					break;
@@ -918,7 +922,8 @@ function parseTrait2Stats (TArray) {
 					Trappings.push("Creature Heart");
 					break;
 	   case "Dionysian Delights":
-					Trappings.push("Jug of wine");
+					//rappings.push("Jug of wine");
+					Trappings.push("Rotgut");
 					break;
 	   case "Smoke Bomb":
 					ItWeapons.push("<B>Smoke Bomb</B>");
@@ -1021,11 +1026,18 @@ SizeN = -1;
 if ( SizeN == -1 ) {
     SizeN = Math.floor(Math.random()*SizeAll.length);
  /* Non basic are rarely small, basic are never huge*/
+ 
  if (Math.random() < (RiskN/(RiskAll.length+1))) {
   SizeN = Math.min(SizeN+1,SizeAll.length-1);
  } else if (Math.random() > (RiskN/(RiskAll.length+1))) {
   SizeN = Math.max(SizeN-1,0);
- }
+ } 
+ if (RiskN <= 2 && SizeN == 3 ) {
+	 SizeN = 1;
+ };
+ if (RiskN > 2 && SizeN == 0 ) {
+	 SizeN = 1;
+ };
 }
 
 SizeName = SizeAll[SizeN];
@@ -1101,10 +1113,15 @@ if ( Math.random() < MageChance[SpeciesN - 1] ) {
     SkillVal -= SkillRanksMax[RiskN] ;
     Mage = 1;
     TraitsAll[RiskN] = TraitsAll[RiskN].concat(TraitsMageAll[RiskN]);
-	Trappings.push("Arcane Tome with " + (SkillRanksMax[RiskN]*3) + " Generalistic and Petty Magick spells");
+	Skills.push("Alchemy");
+	//Add some trappings
+	Trappings.push("Arcane Tome");
+	/*Trappings.push("Arcane Tome with " + (SkillRanksMax[RiskN]*3) + " Generalistic and Petty Magick spells");
 	if (SkillRanksMax[RiskN]>1) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-1)*3) + " Lesser Magick spells");}
 	if (SkillRanksMax[RiskN]>2) {Trappings.push("Arcane Tome with " + ((SkillRanksMax[RiskN]-2)*3) + " Greater Magick spells");}
 	Trappings.push("Reagents appropriate for Magicks (" + (SkillRanksMax[RiskN]*3+3) +")");
+	*/
+	//Add some spells
 	for (let j=0; j < (SkillRanksMax[RiskN]*3); j++) { 
 	    var randSpell = Math.floor( Math.random() * GeneralistSpells.length );
 		SpellNames.push( GeneralistSpells.splice(randSpell,1)[0]);
@@ -1159,7 +1176,7 @@ TraitNames.sort();
 while (SkillVal) {
     var rand =  Math.floor(Math.random()* Skills.length);
     var randrare =  Math.floor(Math.random()* SkillsRare.length);
-    var randVal =  Math.min( Math.floor(Math.random()*  SkillRanksMax[RiskN] ) + 1, SkillVal );
+    var randVal =  Math.min( Math.floor(Math.random()*  SkillRanksMax[RiskN] ) + 2, SkillVal, SkillRanksMax[RiskN] );
     if ((Math.random() < StatsRareChance [ SpeciesN -1]) || (Skills.length > 0)) {
         SkillNames.push( Skills.splice(rand,1)[0]);
         SkillValues.push( randVal );
@@ -1266,18 +1283,25 @@ Secondary[5] =+ Stats[2] + (DodgeVal*10);
 
 /*Animals get Meat and hide*/
 if ( SpeciesN == 2 ) {
- Trappings.push("Animal's Hide");
- Trappings.push("Animal's Meat ("+ (3 + 3 * SizeN) +")");
+	if (SizeN <= 1) {
+		Trappings.push("Hide of a Small Animal");
+	} else  {
+		Trappings.push("Hide of a Large Animal");
+	}
+ //Trappings.push("Animal's Hide");
+	Trappings.push("Animal's Meat ("+ (3 + 3 * SizeN) +")");
 } else if ( SpeciesN == 3) {
- Trappings.push("Beast's Hide");
+	Trappings.push("Hide of a Man-Eater");
 }
 
 Trappings = dedupeName(Trappings);
 Trappings.sort();
 
+/*
 if (Trappings.length == 0) {
  Trappings.push("None");
 }
+*/
 
 //StatsTxt = "<table><tr>";
 //for (i in StatsName) {
@@ -1480,6 +1504,41 @@ let spellList = [];
 if (SpellNames.length >0){
 	spellList = getSpells (SpellNames,"zweihander.zh-magick");
 }
+
+
+async function getTrappings (TrappingsNames) {
+	let trappack = game.packs.get("zweihander.zh-trappings");
+	let itemList;
+	await trappack.getIndex().then(index => itemList = index);
+	
+	//console.log(itemList);
+	let trapList = [];
+	
+	for (let j = 0; j < TrappingsNames.length ; j += 1) {
+		let trapItem;
+		let searchResult = itemList.find(t => t.name == TrappingsNames[j]);
+		if (searchResult) {
+			trapItem = await trappack.getDocument(searchResult._id);
+			trapItem.then;
+		}
+		if (!trapItem) {
+			console.info("No Trapping: " + TrappingsNames[j]);
+			ui.notifications.info("No Trapping: " + TrappingsNames[j] , { permanent: true });
+			trapList.push({"name": TrappingsNames[j],"type": "trapping"})
+			continue;
+		}
+		trapItem = await trapItem.toObject();
+		trapList.push(trapItem);
+	}
+	console.log(trapList);
+	return trapList;
+}
+let trappingList = [];
+
+if (Trappings.length >0){
+	trappingList = getTrappings (Trappings);
+}
+
 //refreshCharacterDisplay ();
 //The bonusTrait data should be replaced by the proper effects.
 
@@ -1488,8 +1547,9 @@ let creaturedata = {
 	type:"creature",
 	data : {
 		details: {
-			size: {value :SizeN},
-			riskFactor: {value: RiskN, notch: NotchN}
+			size: SizeN.toString(),
+			riskFactor: {value: RiskN, notch: NotchN},
+			classification: SpeciesTxt
 		},
 		flavor: {
 			description: "Generator Web version: https://pacomiscelaneousstuff.blogspot.com/2019/09/zweihander-monster-generator.html"
@@ -1531,7 +1591,7 @@ let creaturedata = {
 	//,	items : traitsList
 };
 
-return [creaturedata,TraitNames,traitsList, mutationList, attackList, spellList, weaponList, SkillNames,SkillValues,Trappings];
+return [creaturedata,TraitNames,traitsList, mutationList, attackList, spellList, weaponList, trappingList,SkillNames,SkillValues,Trappings];
 }
 
 let creaturetotal = generateNPC(SpeciesPick);
@@ -1542,6 +1602,7 @@ console.log(creaturetotal[3]);
 console.log(creaturetotal[4]);
 console.log(creaturetotal[5]);
 console.log(creaturetotal[6]);
+console.log(creaturetotal[7]);
 
 let creature = Actor.create(creaturetotal[0]);
 
@@ -1559,6 +1620,7 @@ creature.then(cre => {
 		cre.createEmbeddedDocuments("Item",creaturetotal[4]);
 		cre.createEmbeddedDocuments("Item",creaturetotal[5]);
 		cre.createEmbeddedDocuments("Item",creaturetotal[6]);
+		cre.createEmbeddedDocuments("Item",creaturetotal[7]);
 		//creaturetotal[5].then ( obj => { if (obj.length > 0) cre.createEmbeddedDocuments("Item",obj)});
 		ChatMessage.create(
 			{content: "<p>Generating : @Actor[" + cre.id + "]{" + cre.name + "}</p><p><img width=64 height=64 src='"+cre.img+"'></p>"}, false);
